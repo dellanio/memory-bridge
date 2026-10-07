@@ -92,6 +92,14 @@ try {
     <div style="font-weight:500;font-size:13.5px;line-height:1.35;margin-top:12px;opacity:.95">${T.tag}</div></div></body>`).toString("base64") });
   await shot(`promo-440x280-${suffix}.png`, 440, 280);
 
+  // 5) bloco promocional grande 1400x560
+  await size(1400, 560);
+  await P.call("Page.navigate", { url: "data:text/html;base64," + Buffer.from(`<!doctype html><meta charset="utf-8"><body style="margin:0;width:1400px;height:560px;background:linear-gradient(120deg,#2a1260,#5b2bc4 55%,#8e5cf7);display:flex;align-items:center;gap:56px;padding:0 110px;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;color:#fff">
+    ${svg.replace("<svg ", '<svg width="300" height="300" style="flex:none;filter:drop-shadow(0 14px 36px rgba(0,0,0,.4))" ')}
+    <div><div style="font-weight:800;font-size:76px;line-height:1.05">Memory Bridge</div><div style="opacity:.85;font-weight:600;font-size:34px;margin-top:10px">${T.sub}</div>
+    <div style="font-weight:500;font-size:30px;line-height:1.35;margin-top:30px;max-width:780px">${T.tag}</div></div></body>`).toString("base64") });
+  await shot(`promo-1400x560-${suffix}.png`, 1400, 560);
+
   // limpa os dados de exemplo
   await S.ev("chrome.storage.local.clear()");
   P.close(); S.close();

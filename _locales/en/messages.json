@@ -3,7 +3,7 @@
     "message": "Memory Bridge for Mem0"
   },
   "extDesc": {
-    "message": "Save your ChatGPT and Gemini conversations to your own Mem0 account, with your own user ID."
+    "message": "Automatically save what matters from your ChatGPT and Gemini chats to your own Mem0 account."
   },
   "btnSave": {
     "message": "Save to Mem0"

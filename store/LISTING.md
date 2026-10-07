@@ -1,5 +1,6 @@
 # Ficha da loja — Microsoft Edge Add-ons
 
+Roteiro campo a campo: `store/PARTNER-CENTER.md`.
 Pacote: `dist/memory-bridge-<versão>.zip` (gerado por `node tools/build-zip.mjs`).
 Imagens: `store/` (geradas por `node tools/store-assets.mjs pt-BR` e `en-US`).
 
@@ -20,6 +21,7 @@ Imagens: `store/` (geradas por `node tools/store-assets.mjs pt-BR` e `en-US`).
 |---|---|
 | Logo da loja (300×300) | `store/logo-300.png` |
 | Bloco promocional pequeno (440×280) | `store/promo-440x280-pt.png` / `-en.png` |
+| Bloco promocional grande (1400×560) | `store/promo-1400x560-pt.png` / `-en.png` |
 | Capturas de tela (1280×800) | `store/screenshot-1-options-*.png`, `store/screenshot-2-popup-*.png` |
 
 ---
