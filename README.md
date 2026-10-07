@@ -10,6 +10,7 @@ Extensão para **Edge e Chrome** (Manifest V3) que salva suas conversas do **Cha
 - Modo **manual** (padrão: só salva quando você clica) ou **automático** (salva toda resposta concluída).
 - Envia a última troca (sua pergunta + a resposta) com `user_id` configurável, `app_id` por site (padrão `chatgpt` / `gemini`) e metadados (`site`, `conversation_id`, `url`). O Mem0 extrai os fatos; a conversa inteira não é guardada.
 - Oculta segredos óbvios antes de enviar (chaves de API, tokens, JWT, chaves privadas, números de cartão). Pode desligar.
+- Interface em **Português (Brasil)** e **English (US)**: segue o idioma do navegador ou o que você escolher no topo da tela de Configurações.
 - Não envia a mesma troca duas vezes. Histórico das últimas 30 ações no ícone, com "!" vermelho quando algo falha.
 
 ## Autenticação

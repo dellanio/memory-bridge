@@ -39,6 +39,7 @@ Como funciona
 • Modo automático: cada resposta concluída é enviada ao Mem0, que guarda só os fatos relevantes sobre você. Quando não há nada a guardar, o botão apenas pisca em cinza.
 • Modo manual: só salva quando você clica.
 • Filtro de memórias editável: diga ao Mem0 o que vale lembrar e o que ignorar (por padrão, ignora cálculos, saudações e perguntas pontuais).
+• Interface em português (Brasil) e inglês (EUA).
 
 Sua conta, seus dados
 • Entre com a sua conta Mem0 (OAuth oficial do Mem0) ou use uma chave de API.
@@ -69,6 +70,7 @@ How it works
 • Automatic mode: every finished answer is sent to Mem0, which keeps only the relevant facts about you. When there is nothing worth keeping, the button just blinks grey.
 • Manual mode: saves only when you click.
 • Editable memory filter: tell Mem0 what to remember and what to ignore (by default it skips calculations, greetings and one-off questions).
+• Interface in English (US) and Portuguese (Brazil).
 
 Your account, your data
 • Sign in with your Mem0 account (official Mem0 OAuth) or use an API key.

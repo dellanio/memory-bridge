@@ -126,7 +126,9 @@
   const site = Object.keys(ADAPTERS).find((k) => ADAPTERS[k].match.test(location.hostname));
   if (!site) return;
   const A = ADAPTERS[site];
-  const t = (k, fb) => (chrome.i18n && chrome.i18n.getMessage(k)) || fb;
+  // mensagens no idioma escolhido nas configurações (vêm do service worker)
+  let MSG = {};
+  const t = (k, fb) => MSG[k] || (chrome.i18n && chrome.i18n.getMessage(k)) || fb;
 
   // ---------- botão flutuante (Shadow DOM: não herda nem quebra o CSS do site) ----------
   const host = document.createElement("div");
@@ -165,7 +167,7 @@
     </button>`;
   const btn = root.getElementById("b");
   const lbl = root.getElementById("l");
-  const LABEL = t("btnSave", "Salvar no Mem0");
+  let LABEL = t("btnSave", "Salvar no Mem0");
   lbl.textContent = LABEL;
   document.documentElement.appendChild(host);
   const raise = () => { try { if (host.isConnected && !host.matches(":popover-open")) host.showPopover(); } catch { /* sem Popover API */ } };
@@ -290,6 +292,11 @@
 
   async function loadSettings() {
     try { settings = (await chrome.runtime.sendMessage({ type: "getState" })).settings; } catch { /* SW dormindo */ }
+    try {
+      MSG = (await chrome.runtime.sendMessage({ type: "i18n" })).messages || {};
+      LABEL = t("btnSave", "Salvar no Mem0");
+      if (!btn.className) lbl.textContent = LABEL;
+    } catch { /* mantém o idioma do navegador */ }
     refresh();
   }
   chrome.storage.onChanged.addListener((c) => { if (c.settings) loadSettings(); });

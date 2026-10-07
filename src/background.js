@@ -13,7 +13,7 @@ async function waitEvent(check) {
   await sleep(2000);
   while (Date.now() < until) {
     const o = eventOutcome(await check());
-    if (o.done) { if (o.failed) throw new Error(`Mem0 não processou: ${o.error}`); return o.memories; }
+    if (o.done) { if (o.failed) throw new Error(`Mem0: ${o.error}`); return o.memories; }
     await sleep(EVENT_POLL_MS);
   }
   return null;
@@ -28,9 +28,37 @@ const DEFAULTS = {
   sites: { chatgpt: true, gemini: true },
   appIds: { chatgpt: "chatgpt", gemini: "gemini" },
   redactSecrets: true,
-  instructions: null,         // null = instrução padrão no idioma do navegador
+  instructions: null,         // null = instrução padrão no idioma escolhido
+  language: "auto",           // "auto" (idioma do navegador) | "pt_BR" | "en"
 };
-const defaultInstructions = () => chrome.i18n.getMessage("defaultInstructions");
+
+// ---------- idioma ----------
+// chrome.i18n segue só o idioma do navegador; para o usuário poder escolher, as
+// mensagens de _locales são carregadas aqui e servidas às páginas e ao content script.
+const LANGS = ["pt_BR", "en"];
+const dictCache = {};
+function resolveLang(pref) {
+  if (LANGS.includes(pref)) return pref;
+  return (chrome.i18n.getUILanguage() || "").toLowerCase().startsWith("pt") ? "pt_BR" : "en";
+}
+async function dict(lang) {
+  if (!dictCache[lang]) {
+    const raw = await (await fetch(chrome.runtime.getURL(`_locales/${lang}/messages.json`))).json();
+    dictCache[lang] = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, v.message]));
+  }
+  return dictCache[lang];
+}
+async function currentLang() {
+  const { settings } = await chrome.storage.local.get("settings");
+  return resolveLang((settings || {}).language);
+}
+async function T(key, ...args) {
+  const d = await dict(await currentLang());
+  let s = d[key] || (await dict("en"))[key] || key;
+  args.forEach((a, i) => { s = s.replace(`$${i + 1}`, a); });
+  return s;
+}
+const defaultInstructions = async (lang) => (await dict(lang || await currentLang())).defaultInstructions;
 const LOG_MAX = 30;
 const SENT_MAX = 500;
 
@@ -59,13 +87,19 @@ async function getSettings() {
   const { settings } = await chrome.storage.local.get("settings");
   const s = settings || {};
   return { ...DEFAULTS, ...s,
-    instructions: typeof s.instructions === "string" ? s.instructions : defaultInstructions(),
+    instructions: typeof s.instructions === "string" ? s.instructions : await defaultInstructions(resolveLang(s.language)),
     sites: { ...DEFAULTS.sites, ...(s.sites || {}) },
     appIds: { ...DEFAULTS.appIds, ...(s.appIds || {}) } };
 }
 async function setSettings(patch) {
   const s = await getSettings();
-  await chrome.storage.local.set({ settings: { ...s, ...patch } });
+  const next = { ...s, ...patch };
+  // trocou o idioma e a instrução era a padrão do idioma anterior: passa a usar a do novo
+  if (patch.language && resolveLang(patch.language) !== resolveLang(s.language)
+      && (next.instructions || "").trim() === ((await defaultInstructions(resolveLang(s.language))) || "").trim()) {
+    next.instructions = null;
+  }
+  await chrome.storage.local.set({ settings: next });
 }
 async function getAuth() { return (await chrome.storage.local.get("auth")).auth || null; }
 async function setAuth(a) { await chrome.storage.local.set({ auth: a }); }
@@ -143,23 +177,23 @@ async function login() {
   });
   const back = await chrome.identity.launchWebAuthFlow({ url: url.toString(), interactive: true });
   const q = new URL(back).searchParams;
-  if (q.get("error")) throw new Error(`login recusado: ${q.get("error")}`);
-  if (q.get("state") !== state) throw new Error("login inválido (state não confere)");
+  if (q.get("error")) throw new Error(await T("errLoginRefused", q.get("error")));
+  if (q.get("state") !== state) throw new Error(await T("errLoginInvalid"));
   const t = await tokenRequest(meta, {
     grant_type: "authorization_code", code: q.get("code"), redirect_uri: redirectUri,
     client_id: auth.clientId, code_verifier: verifier, resource: MCP_ISSUER,
   });
   auth = storeTokens(auth, t);
   await setAuth(auth);
-  await addLog({ status: "ok", site: "-", preview: "Conectado ao Mem0 (OAuth)" });
+  await addLog({ status: "ok", site: "-", preview: await T("logConnected") });
   return true;
 }
 
 async function accessToken() {
   let auth = await getAuth();
-  if (!auth || !auth.accessToken) throw new Error("não conectado ao Mem0: abra as opções e clique em Conectar");
+  if (!auth || !auth.accessToken) throw new Error(await T("errNotConnected"));
   if (Date.now() < auth.expiresAt) return auth.accessToken;
-  if (!auth.refreshToken) throw new Error("sessão do Mem0 expirou: conecte de novo");
+  if (!auth.refreshToken) throw new Error(await T("errSessionExpired"));
   const t = await tokenRequest(await oauthMeta(), {
     grant_type: "refresh_token", refresh_token: auth.refreshToken,
     client_id: auth.clientId, resource: MCP_ISSUER,
@@ -197,7 +231,7 @@ async function mcpPost(token, sessionId, payload) {
     // detalhe para diagnóstico: corpo e www-authenticate (ex.: insufficient_scope), sem o token
     const why = [r.headers.get("www-authenticate"), text.replace(/\s+/g, " ").slice(0, 160)].filter(Boolean).join(" | ");
     const step = payload.method || "?";
-    if (r.status === 401) throw new Error(`Mem0 recusou o login (401, ${step}): conecte de novo. ${why}`);
+    if (r.status === 401) throw new Error(`${await T("errUnauthorized")} (401, ${step}) ${why}`);
     throw new Error(`MCP ${step}: HTTP ${r.status} ${why}`);
   }
   return { sessionId: r.headers.get("Mcp-Session-Id") || sessionId,
@@ -234,7 +268,7 @@ async function addViaMcp(ex, settings) {
 }
 
 async function addViaRest(ex, settings) {
-  if (!settings.apiKey) throw new Error("chave de API não configurada");
+  if (!settings.apiKey) throw new Error(await T("errNoApiKey"));
   const r = await fetch(REST_ADD_URL, { method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Token ${settings.apiKey}` },
     body: JSON.stringify(restBody(ex, settings)) });
@@ -255,8 +289,8 @@ async function save(raw, { manual }) {
   if (!settings.sites[raw.site]) return { status: "skipped", reason: "site desativado" };
   if (!manual && settings.mode !== "auto") return { status: "skipped", reason: "modo manual" };
   if (!settings.userId.trim()) {
-    await addLog({ status: "error", site: raw.site, preview: "Configure o usuário (user_id) nas opções" });
-    return { status: "error", error: "usuário não configurado" };
+    await addLog({ status: "error", site: raw.site, preview: await T("errNeedUserLog") });
+    return { status: "error", error: await T("errNeedUserLog") };
   }
   if (!raw.user || !raw.assistant) return { status: "skipped", reason: "conversa incompleta" };
   const ex = prepareExchange(raw, { redactSecrets: settings.redactSecrets });
@@ -285,12 +319,12 @@ async function testConnection() {
   const settings = await getSettings();
   if (settings.authMode === "apikey") {
     const r = await fetch("https://api.mem0.ai/v1/entities/", { headers: { Authorization: `Token ${settings.apiKey}` } });
-    if (!r.ok) throw new Error(`chave recusada: HTTP ${r.status}`);
-    return "Chave de API válida.";
+    if (!r.ok) throw new Error(`${await T("errKeyRefused")}: HTTP ${r.status}`);
+    return T("testKeyOk");
   }
   const s = await mcpSession();
   const { tools = [] } = await s.call("tools/list", {});
-  return `Conectado: ${tools.length} ferramentas do Mem0 disponíveis.`;
+  return T("testMcpOk", String(tools.length));
 }
 
 chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
@@ -298,7 +332,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
     switch (msg.type) {
       case "save": return save(msg.exchange, { manual: !!msg.manual });
       case "diag": await chrome.storage.session.set({ [`diag_${msg.data.site}`]: msg.data }); return { ok: true };
-      case "defaultInstructions": return { text: defaultInstructions() };
+      case "defaultInstructions": return { text: await defaultInstructions() };
+      case "i18n": { const lang = await currentLang(); return { lang, messages: await dict(lang) }; }
       case "getDiag": return chrome.storage.session.get(["diag_chatgpt", "diag_gemini"]);
       case "getState": return { settings: await getSettings(), auth: !!(await getAuth())?.accessToken,
         log: (await chrome.storage.local.get("log")).log || [] };

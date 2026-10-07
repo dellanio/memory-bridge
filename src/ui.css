@@ -80,3 +80,5 @@ pre.diag{white-space:pre-wrap;font-size:11px;background:var(--card);border:1px s
 .pop-actions .btn{padding:7px 12px;font-size:12px}
 .textarea{max-width:none;resize:vertical;min-height:120px;line-height:1.45;font-size:13px}
 .small-btn{padding:6px 10px;font-size:12px}
+.lang-select{font:600 12.5px inherit;font-family:inherit;color:#fff;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 10px;cursor:pointer}
+.lang-select option{color:#1d1b26;background:#fff}

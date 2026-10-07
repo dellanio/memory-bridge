@@ -148,5 +148,47 @@
   },
   "logNothing": {
     "message": "nada a guardar"
+  },
+  "langAuto": {
+    "message": "Automático (idioma do navegador)"
+  },
+  "logConnected": {
+    "message": "Conectado ao Mem0 (OAuth)"
+  },
+  "errLoginRefused": {
+    "message": "Login recusado: $1"
+  },
+  "errLoginInvalid": {
+    "message": "Login inválido (state não confere). Tente de novo."
+  },
+  "errNotConnected": {
+    "message": "Não conectado ao Mem0: abra as Configurações e clique em Conectar"
+  },
+  "errSessionExpired": {
+    "message": "A sessão do Mem0 expirou: conecte de novo"
+  },
+  "errUnauthorized": {
+    "message": "O Mem0 recusou o login: conecte de novo"
+  },
+  "errNoApiKey": {
+    "message": "Chave de API não configurada"
+  },
+  "errNeedUserLog": {
+    "message": "Configure o seu User ID nas Configurações"
+  },
+  "errKeyRefused": {
+    "message": "Chave de API recusada"
+  },
+  "testKeyOk": {
+    "message": "Chave de API válida."
+  },
+  "testMcpOk": {
+    "message": "Conectado: $1 ferramentas do Mem0 disponíveis."
+  },
+  "errGeneric": {
+    "message": "erro"
+  },
+  "userIdPlaceholder": {
+    "message": "ex.: maria"
   }
 }

@@ -148,5 +148,47 @@
   },
   "logNothing": {
     "message": "nothing to keep"
+  },
+  "langAuto": {
+    "message": "Automatic (browser language)"
+  },
+  "logConnected": {
+    "message": "Connected to Mem0 (OAuth)"
+  },
+  "errLoginRefused": {
+    "message": "Sign-in refused: $1"
+  },
+  "errLoginInvalid": {
+    "message": "Invalid sign-in (state mismatch). Try again."
+  },
+  "errNotConnected": {
+    "message": "Not connected to Mem0: open Settings and click Connect"
+  },
+  "errSessionExpired": {
+    "message": "Mem0 session expired: connect again"
+  },
+  "errUnauthorized": {
+    "message": "Mem0 rejected the sign-in: connect again"
+  },
+  "errNoApiKey": {
+    "message": "API key not set"
+  },
+  "errNeedUserLog": {
+    "message": "Set your User ID in Settings"
+  },
+  "errKeyRefused": {
+    "message": "API key rejected"
+  },
+  "testKeyOk": {
+    "message": "API key is valid."
+  },
+  "testMcpOk": {
+    "message": "Connected: $1 Mem0 tools available."
+  },
+  "errGeneric": {
+    "message": "error"
+  },
+  "userIdPlaceholder": {
+    "message": "e.g. maria"
   }
 }

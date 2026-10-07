@@ -1,9 +1,12 @@
 const $ = (id) => document.getElementById(id);
 const msg = (m) => chrome.runtime.sendMessage(m);
-const t = (k) => chrome.i18n.getMessage(k);
+const t = (k) => window.tr(k);
 
 async function load() {
+  await window.i18nReady;
   const { settings: s, auth } = await msg({ type: "getState" });
+  $("language").value = s.language || "auto";
+  $("userId").placeholder = t("userIdPlaceholder");
   document.querySelector(`input[name=auth][value=${s.authMode}]`).checked = true;
   document.querySelector(`input[name=mode][value=${s.mode}]`).checked = true;
   $("apiKey").value = s.apiKey || "";
@@ -37,7 +40,7 @@ function collect() {
 }
 
 function show(el, r, okText) {
-  el.textContent = r && r.ok !== false ? (okText || r.message || "OK") : (r && r.error) || "erro";
+  el.textContent = r && r.ok !== false ? (okText || r.message || "OK") : (r && r.error) || t("errGeneric");
   el.className = "note " + (r && r.ok !== false ? "ok" : "err");
 }
 
@@ -61,6 +64,12 @@ $("connect").onclick = async () => {
     b.disabled = false;
     load();
   }
+};
+$("language").onchange = async () => {
+  // salva o idioma (e o resto do formulário) e recarrega a página já traduzida
+  await msg({ type: "setSettings", patch: { ...collect(), language: $("language").value,
+    instructions: $("instructions").value.trim() } });
+  location.reload();
 };
 $("restoreInstr").onclick = async () => { $("instructions").value = (await msg({ type: "defaultInstructions" })).text; };
 $("disconnect").onclick = async () => { await msg({ type: "logout" }); load(); };
