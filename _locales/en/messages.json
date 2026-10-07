@@ -139,5 +139,14 @@
   },
   "defaultInstructions": {
     "message": "Extract only durable facts about the user: preferences, opinions, personal and professional details, projects, decisions, goals and life context. Ignore calculations, greetings, one-off questions, general trivia, generic content from the assistant's answers and any fact that is not about the user. When the user changes a preference or decision, record the new one making clear it replaces the previous one."
+  },
+  "tipNothing": {
+    "message": "Mem0 found nothing worth remembering in this conversation"
+  },
+  "btnPending": {
+    "message": "Sent — Mem0 is still processing"
+  },
+  "logNothing": {
+    "message": "nothing to keep"
   }
 }

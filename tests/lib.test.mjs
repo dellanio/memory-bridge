@@ -2,6 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
+  eventIdOf, eventOutcome,
   redact, clean, prepareExchange, exchangeKey, buildAddArgs, restBody,
   parseMcpResponse, toolResultText, pkceChallenge, b64url,
 } from "../src/lib.js";
@@ -94,4 +95,16 @@ test("PKCE: desafio S256 do exemplo da RFC 7636", async () => {
   assert.equal(await pkceChallenge("dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"),
     "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM");
   assert.equal(b64url(new Uint8Array([251, 255])), "-_8");
+});
+
+test("evento do Mem0: id e resultado (REST e MCP)", () => {
+  assert.equal(eventIdOf('{"event_id":"abc","status":"PENDING"}'), "abc");
+  assert.equal(eventIdOf({ content: [{ type: "text", text: '{"event_id":"x1"}' }], structuredContent: { event_id: "x1" } }), "x1");
+  assert.deepEqual(eventOutcome({ status: "RUNNING" }), { done: false });
+  assert.deepEqual(eventOutcome({ status: "SUCCEEDED", results: [] }), { done: true, memories: [] });
+  assert.deepEqual(eventOutcome({ status: "SUCCEEDED", results: [{ data: { memory: "Cor favorita azul" }, event: "ADD" }] }),
+    { done: true, memories: ["Cor favorita azul"] });
+  const mcp = { content: [{ type: "text", text: JSON.stringify({ status: "SUCCEEDED", results: [] }) }] };
+  assert.deepEqual(eventOutcome(mcp), { done: true, memories: [] });
+  assert.equal(eventOutcome({ status: "FAILED", error: "x" }).failed, true);
 });

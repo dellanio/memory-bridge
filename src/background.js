@@ -2,7 +2,22 @@
 import {
   MCP_URL, MCP_ISSUER, REST_ADD_URL, randomString, pkceChallenge,
   prepareExchange, exchangeKey, restBody, buildAddArgs, parseMcpResponse, toolResultText,
+  eventIdOf, eventOutcome,
 } from "./lib.js";
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const EVENT_WAIT_MS = 30000, EVENT_POLL_MS = 1500;
+
+// espera o Mem0 processar o evento e devolve as memórias criadas (null = não deu tempo)
+async function waitEvent(check) {
+  const until = Date.now() + EVENT_WAIT_MS;
+  await sleep(2000);
+  while (Date.now() < until) {
+    const o = eventOutcome(await check());
+    if (o.done) { if (o.failed) throw new Error(`Mem0 não processou: ${o.error}`); return o.memories; }
+    await sleep(EVENT_POLL_MS);
+  }
+  return null;
+}
 
 const DEFAULTS = {
   enabled: true,
@@ -213,7 +228,9 @@ async function addViaMcp(ex, settings) {
   const res = await s.call("tools/call", { name: tool.name, arguments: buildAddArgs(tool.inputSchema, ex, settings) });
   const text = toolResultText(res);
   if (res.isError) throw new Error(text || "add_memory falhou");
-  return text;
+  const id = eventIdOf(res);
+  if (!id || !tools.some((t) => t.name === "get_event_status")) return null;
+  return waitEvent(async () => s.call("tools/call", { name: "get_event_status", arguments: { event_id: id } }));
 }
 
 async function addViaRest(ex, settings) {
@@ -223,7 +240,12 @@ async function addViaRest(ex, settings) {
     body: JSON.stringify(restBody(ex, settings)) });
   const text = await r.text();
   if (!r.ok) throw new Error(`Mem0: HTTP ${r.status} ${text.slice(0, 200)}`);
-  return text;
+  const id = eventIdOf(text);
+  if (!id) return null;
+  return waitEvent(async () => {
+    const e = await fetch(`https://api.mem0.ai/v1/event/${id}/`, { headers: { Authorization: `Token ${settings.apiKey}` } });
+    return e.ok ? e.json() : null;
+  });
 }
 
 // ---------- fluxo de envio ----------
@@ -241,11 +263,18 @@ async function save(raw, { manual }) {
   const key = exchangeKey(ex);
   if (await alreadySent(key)) return { status: "duplicate" };
   try {
-    if (settings.authMode === "apikey") await addViaRest(ex, settings);
-    else await addViaMcp(ex, settings);
+    const memories = settings.authMode === "apikey" ? await addViaRest(ex, settings) : await addViaMcp(ex, settings);
     await markSent(key);
-    await addLog({ status: "ok", site: ex.site, preview: ex.user.slice(0, 90) });
-    return { status: "ok" };
+    if (memories === null) {
+      await addLog({ status: "pending", site: ex.site, preview: ex.user.slice(0, 90) });
+      return { status: "pending" };
+    }
+    if (!memories.length) {
+      await addLog({ status: "none", site: ex.site, preview: ex.user.slice(0, 90) });
+      return { status: "nothing" };
+    }
+    await addLog({ status: "ok", site: ex.site, preview: memories.join(" · ").slice(0, 160) });
+    return { status: "ok", memories };
   } catch (e) {
     await addLog({ status: "error", site: ex.site, preview: String(e.message || e).slice(0, 300) });
     return { status: "error", error: String(e.message || e) };

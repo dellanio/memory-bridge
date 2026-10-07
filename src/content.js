@@ -146,6 +146,9 @@
       button.idle{opacity:.6}
       svg{width:20px;height:20px;flex:none}
       .ok{background:#2e7d32}.err{background:#c62828}.busy{background:#6b5a8e}
+      /* nada a guardar: 3 piscadas de cinza claro, sem mudar o texto */
+      @keyframes nada{0%,100%{filter:none}50%{background:#d9d9de;color:#55525f;box-shadow:none}}
+      .nada{animation:nada .45s ease-in-out 3}
     </style>
     <button id="b" title="">
       <svg viewBox="0 0 128 128" aria-hidden="true">
@@ -187,16 +190,32 @@
   }
   const keyOf = (ex) => `${ex.conversationId}|${ex.user.length}|${ex.assistant.length}|${ex.user.slice(0, 40)}`;
 
+  function blinkNothing() {
+    clearTimeout(resetTimer);
+    btn.className = "";
+    lbl.textContent = LABEL;
+    void btn.offsetWidth;            // reinicia a animação se já tiver rodado
+    btn.className = "nada";
+    btn.title = t("tipNothing", "O Mem0 não encontrou nada para guardar nesta conversa");
+    resetTimer = setTimeout(() => { btn.className = ""; refresh(); }, 1500);
+  }
+
+  // Manual: mostra "Salvando…" e o resultado. Automático: fica quieto enquanto o Mem0
+  // processa e só mostra "Salvo ✓" se alguma memória foi criada; se não, 3 piscadas cinza.
   async function send(manual) {
     const ex = current();
     if (!ex) { if (manual) flash("err", t("btnNothing", "Nada para salvar — use o Diagnóstico"), 3500); return; }
     lastSentKey = keyOf(ex);
-    flash("busy", t("btnSaving", "Salvando…"), 0);
+    if (manual) flash("busy", t("btnSaving", "Salvando…"), 0);
     let r;
     try { r = await chrome.runtime.sendMessage({ type: "save", manual, exchange: ex }); }
     catch (e) { r = { status: "error", error: String(e) }; }
-    if (r.status === "ok") flash("ok", t("btnSaved", "Salvo ✓"));
-    else if (r.status === "duplicate") flash("ok", t("btnAlready", "Já salvo ✓"));
+    if (r.status === "ok") {
+      flash("ok", t("btnSaved", "Salvo ✓"));
+      btn.title = (r.memories || []).join("\n");
+    } else if (r.status === "nothing") blinkNothing();
+    else if (r.status === "duplicate") { if (manual) flash("ok", t("btnAlready", "Já salvo ✓")); }
+    else if (r.status === "pending") { if (manual) flash("busy", t("btnPending", "Enviado — o Mem0 ainda está processando"), 3000); }
     else if (r.status === "skipped") { btn.className = ""; lbl.textContent = LABEL; }
     else flash("err", t("btnError", "Erro — veja o ícone"), 4000);
   }

@@ -156,3 +156,28 @@ export function toolResultText(result) {
   const parts = (result && result.content) || [];
   return parts.filter((p) => p.type === "text").map((p) => p.text).join("\n");
 }
+
+// ---------- evento assíncrono do Mem0 ----------
+// add devolve {event_id, status: PENDING}; o evento termina com results = memórias criadas
+// (lista vazia = o Mem0 achou que não havia nada a guardar).
+export function eventIdOf(res) {
+  if (!res) return null;
+  if (typeof res === "string") { try { return eventIdOf(JSON.parse(res)); } catch { return null; } }
+  if (res.event_id) return res.event_id;
+  if (res.structuredContent) return eventIdOf(res.structuredContent);
+  if (Array.isArray(res.content)) return eventIdOf(toolResultText(res));
+  return null;
+}
+
+export function eventOutcome(ev) {
+  if (!ev) return { done: false };
+  if (typeof ev === "string") { try { ev = JSON.parse(ev); } catch { return { done: false }; } }
+  if (ev.structuredContent) ev = ev.structuredContent;
+  else if (Array.isArray(ev.content)) return eventOutcome(toolResultText(ev));
+  const st = String(ev.status || "").toUpperCase();
+  if (st === "FAILED") return { done: true, failed: true, error: ev.error || "falhou" };
+  if (st !== "SUCCEEDED") return { done: false };
+  const memories = (ev.results || []).filter((r) => (r.event || "ADD") !== "NONE")
+    .map((r) => (r.data && r.data.memory) || r.memory).filter(Boolean);
+  return { done: true, memories };
+}

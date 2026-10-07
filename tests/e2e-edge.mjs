@@ -90,9 +90,24 @@ try {
   if (restUser) {
     // modo auto: espera a extensão enviar sozinha
     let log = [];
-    for (let i = 0; i < 20; i++) { await sleep(1500); log = (await S.evaluate("chrome.storage.local.get('log')")).log || []; if (log.length) break; }
-    console.log("  log:", JSON.stringify(log.slice(0, 2)));
-    check(log[0] && log[0].status === "ok", `envio automático para o Mem0 (${viaMcp ? "MCP" : "REST"}) com o user_id configurado`);
+    let cls = [];
+    for (let i = 0; i < 120; i++) {
+      await sleep(400);
+      // classe do botão (shadow fechado: lida pelo DOM do DevTools)
+      const doc = await P.send("DOM.getDocument", { depth: -1, pierce: true });
+      const find = (n) => { if (n.nodeName === "BUTTON" && (n.attributes || []).includes("b")) return n; for (const c of [...(n.children || []), ...(n.shadowRoots || [])]) { const f = find(c); if (f) return f; } return null; };
+      const bn = find(doc.root); const a = bn ? bn.attributes : []; const ci = a.indexOf("class");
+      const c = ci >= 0 ? a[ci + 1] : ""; if (c && cls[cls.length - 1] !== c) cls.push(c);
+      log = (await S.evaluate("chrome.storage.local.get('log')")).log || [];
+      if (log.length && i > 3 && (cls.includes("nada") || cls.includes("ok") || log[0].status === "error")) break;
+    }
+    console.log("  log:", JSON.stringify(log.slice(0, 1)));
+    console.log("  classes do botão ao longo do envio:", JSON.stringify(cls));
+    const want = process.env.E2E_EXPECT || "ok";
+    check(log[0] && log[0].status === want, `envio automático (${viaMcp ? "MCP" : "REST"}): status ${log[0] && log[0].status} (esperado ${want})`);
+    check(!cls.includes("busy"), "modo automático não mostra \"Salvando…\"");
+    if (want === "none") check(cls.includes("nada") && !cls.includes("ok"), "nada a guardar: piscadas cinza, sem \"Salvo\"");
+    if (want === "ok") check(cls.includes("ok"), "memória criada: mostra \"Salvo ✓\"");
   } else {
     // modo manual sem user_id: clicar no botão deve registrar o aviso de configuração
     await sleep(4000);

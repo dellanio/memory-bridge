@@ -139,5 +139,14 @@
   },
   "defaultInstructions": {
     "message": "Extraia apenas fatos duradouros sobre o usuário: preferências, opiniões, dados pessoais e profissionais, projetos, decisões, metas e contexto de vida. Ignore cálculos, saudações, perguntas pontuais, curiosidades gerais, conteúdo genérico das respostas do assistente e qualquer fato que não seja sobre o usuário. Quando o usuário mudar uma preferência ou decisão, registre a nova deixando claro que ela substitui a anterior."
+  },
+  "tipNothing": {
+    "message": "O Mem0 não encontrou nada para guardar nesta conversa"
+  },
+  "btnPending": {
+    "message": "Enviado — o Mem0 ainda está processando"
+  },
+  "logNothing": {
+    "message": "nada a guardar"
   }
 }

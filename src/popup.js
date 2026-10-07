@@ -12,8 +12,10 @@ async function load() {
   for (const e of log.slice(0, 12)) {
     const li = document.createElement("li");
     const time = new Date(e.at).toLocaleString([], { dateStyle: "short", timeStyle: "short" });
-    li.className = e.status === "error" ? "err" : "";
-    li.textContent = `${e.status === "error" ? "✗" : "✓"} ${time} · ${e.site} · ${e.preview}`;
+    const mark = { error: "✗", none: "–", pending: "…" }[e.status] || "✓";
+    li.className = e.status === "error" ? "err" : e.status === "none" || e.status === "pending" ? "muted" : "";
+    const note = e.status === "none" ? chrome.i18n.getMessage("logNothing") + " · " : "";
+    li.textContent = `${mark} ${time} · ${e.site} · ${note}${e.preview}`;
     ul.append(li);
   }
 }
