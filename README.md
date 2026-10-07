@@ -1,4 +1,4 @@
-# Memory Bridge for Mem0 (não oficial)
+# Memory Bridge for Mem0
 
 Extensão para **Edge e Chrome** (Manifest V3) que salva suas conversas do **ChatGPT** e do **Gemini** na **sua** conta [Mem0](https://mem0.ai), com o **seu** `user_id`.
 
