@@ -11,13 +11,14 @@ async function load() {
   for (const k of ["chatgpt", "gemini"]) { $(`site_${k}`).checked = !!s.sites[k]; $(`app_${k}`).value = s.appIds[k] || k; }
   $("redact").checked = !!s.redactSecrets;
   $("authState").textContent = auth ? t("connected") : t("notConnected");
-  $("authState").className = auth ? "ok" : "muted";
+  $("authState").className = auth ? "pill ok" : "pill";
+  $("version").textContent = "v" + chrome.runtime.getManifest().version;
   toggle();
 }
 
 function toggle() {
   const oauth = document.querySelector("input[name=auth]:checked").value === "oauth";
-  $("oauthBox").style.opacity = oauth ? 1 : 0.4;
+  $("oauthBox").style.display = oauth ? "" : "none";
   $("keyBox").style.display = oauth ? "none" : "";
 }
 
@@ -35,17 +36,20 @@ function collect() {
 
 function show(el, r, okText) {
   el.textContent = r && r.ok !== false ? (okText || r.message || "OK") : (r && r.error) || "erro";
-  el.className = r && r.ok !== false ? "ok" : "err";
+  el.className = "note " + (r && r.ok !== false ? "ok" : "err");
 }
 
 document.querySelectorAll("input[name=auth]").forEach((e) => e.addEventListener("change", toggle));
-$("save").onclick = async () => { show($("saveOut"), await msg({ type: "setSettings", patch: collect() }), t("saved")); };
+$("save").onclick = async () => {
+  show($("saveOut"), await msg({ type: "setSettings", patch: collect() }), t("saved"));
+  setTimeout(() => { $("saveOut").textContent = ""; }, 2500);
+};
 $("connect").onclick = async () => {
   const b = $("connect");
   if (b.disabled) return;
   b.disabled = true;                       // evita vários cliques enquanto a janela do Mem0 abre
   $("authState").textContent = t("optWaiting");
-  $("authState").className = "wait";
+  $("authState").className = "pill wait";
   $("testOut").textContent = "";
   try {
     await msg({ type: "setSettings", patch: collect() });

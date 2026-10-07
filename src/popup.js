@@ -19,5 +19,17 @@ async function load() {
 }
 $("enabled").onchange = (e) => msg({ type: "setSettings", patch: { enabled: e.target.checked } });
 $("opts").onclick = () => chrome.runtime.openOptionsPage();
+$("diagBtn").onclick = async () => {
+  const out = $("diag");
+  out.hidden = false;
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const r = await chrome.tabs.sendMessage(tab.id, { type: "diagnose" });
+    out.textContent = Object.entries(r).map(([k, v]) => `${k}: ${typeof v === "object" ? JSON.stringify(v) : v}`).join("\n");
+    navigator.clipboard?.writeText(out.textContent).catch(() => {});
+  } catch {
+    out.textContent = chrome.i18n.getMessage("diagNoTab");
+  }
+};
 $("clear").onclick = async () => { await msg({ type: "clearLog" }); load(); };
 load();

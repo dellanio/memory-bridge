@@ -105,6 +105,10 @@ try {
     const log = (await S.evaluate("chrome.storage.local.get('log')")).log || [];
     check(log[0] && /user/i.test(log[0].preview), `clique sem user_id gera aviso: ${JSON.stringify(log[0])}`);
   }
+  if (process.env.E2E_SHOT) {
+    const s = await P.send("Page.captureScreenshot", { format: "png" });
+    (await import("node:fs")).writeFileSync(process.env.E2E_SHOT, Buffer.from(s.data, "base64"));
+  }
   P.close(); S.close();
 } catch (e) {
   console.error("✖ erro:", e.message); ok = false;

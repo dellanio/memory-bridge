@@ -32,5 +32,10 @@ try {
   await ev("document.getElementById('connect').click()");
   await sleep(300);
   console.log("após clicar em Conectar:", JSON.stringify(await ev("({estado: document.getElementById('authState').textContent, botaoDesabilitado: document.getElementById('connect').disabled})")));
+  await call("Emulation.setDeviceMetricsOverride", { width: 340, height: 420, deviceScaleFactor: 1, mobile: false });
+  await call("Page.navigate", { url: `chrome-extension://${id}/src/popup.html` });
+  await sleep(1200);
+  const pop = await call("Page.captureScreenshot", { format: "png" });
+  writeFileSync(OUT.replace(/\.png$/, "-popup.png"), Buffer.from(pop.result.data, "base64"));
   ws.close();
 } finally { edge.kill(); await sleep(800); try { rmSync(prof, { recursive: true, force: true }); } catch {} }

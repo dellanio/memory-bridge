@@ -14,20 +14,28 @@
     if (label && t.startsWith(txt(label))) t = t.slice(txt(label).length);
     return t.replace(LABEL_RE, "").trim();
   };
+  // botão de interromper a geração (aria-label em pt/en); evita casar com "Parar leitura em voz alta" etc.
+  const STOP_RE = /^(stop (streaming|generating|response)|parar (transmissão|geração|de gerar|resposta)|interromper (geração|transmissão|resposta))/i;
+  const stopButton = () => document.querySelector('[data-testid="stop-button"]')
+    || [...document.querySelectorAll("button[aria-label]")].find((b) => STOP_RE.test(b.getAttribute("aria-label").trim()));
 
   const ADAPTERS = {
     chatgpt: {
       match: /(^|\.)chatgpt\.com$|(^|\.)chat\.openai\.com$/,
       conversationId: () => (location.pathname.match(/\/u?c\/([\w-]+)/) || [])[1]
         || (document.querySelector("[data-conversation-id]") || {}).dataset?.conversationId || null,
-      // layout atual: li[data-message-role]; layout antigo: [data-message-author-role]
+      // layout novo: li[data-message-role]; layout clássico (logado): [data-message-author-role]
       turns: () => [...document.querySelectorAll("[data-message-role], [data-message-author-role]")]
-        .map((el) => ({ el, role: el.dataset.messageRole || el.dataset.messageAuthorRole })),
+        .map((el) => ({ el, role: el.dataset.messageRole || el.dataset.messageAuthorRole }))
+        // um nó pode conter outro com o mesmo papel: fica só o mais externo
+        .filter((t, i, all) => !all.some((o, j) => j !== i && o.el !== t.el && o.el.contains(t.el))),
       generating() {
-        if (document.querySelector('[data-testid="stop-button"], button[aria-label*="Stop" i], button[aria-label*="Parar" i], button[aria-label*="Interromper" i]')) return true;
+        const s = stopButton();
+        if (s) return "botão " + (s.getAttribute("aria-label") || s.dataset.testid);
         const a = last(this.turns().filter((t) => t.role === "assistant"));
         // o layout novo marca a resposta terminada com data-message-complete
-        return !!(a && a.el.hasAttribute("data-message-role") && !a.el.hasAttribute("data-message-complete"));
+        if (a && a.el.hasAttribute("data-message-role") && !a.el.hasAttribute("data-message-complete")) return "sem data-message-complete";
+        return "";
       },
       lastExchange() {
         const turns = this.turns();
@@ -38,14 +46,18 @@
         if (ai < 0 || ui < 0) return null;
         // várias mensagens seguidas do assistente na mesma resposta: junta todas
         const parts = turns.slice(ui + 1).filter((t) => t.role === "assistant").map((t) => msgText(t.el));
-        return { user: msgText(turns[ui].el), assistant: parts.join("\n\n") };
+        return { user: msgText(turns[ui].el), assistant: parts.filter(Boolean).join("\n\n") };
       },
     },
     gemini: {
       match: /(^|\.)gemini\.google\.com$/,
       conversationId: () => (location.pathname.match(/\/app\/([\w-]+)/) || [])[1] || null,
-      generating: () => !!document.querySelector(
-        'button[aria-label*="Stop" i], button[aria-label*="Parar" i], button[aria-label*="Interromper" i]'),
+      turns: () => [...document.querySelectorAll("user-query, model-response")]
+        .map((el) => ({ el, role: el.tagName === "USER-QUERY" ? "user" : "assistant" })),
+      generating() {
+        const s = stopButton();
+        return s ? "botão " + s.getAttribute("aria-label") : "";
+      },
       lastExchange() {
         const u = last(document.querySelectorAll("user-query"));
         const a = last(document.querySelectorAll("model-response"));
@@ -60,6 +72,7 @@
   const site = Object.keys(ADAPTERS).find((k) => ADAPTERS[k].match.test(location.hostname));
   if (!site) return;
   const A = ADAPTERS[site];
+  const t = (k, fb) => (chrome.i18n && chrome.i18n.getMessage(k)) || fb;
 
   // ---------- botão flutuante (Shadow DOM: não herda nem quebra o CSS do site) ----------
   const host = document.createElement("div");
@@ -68,25 +81,43 @@
   // innerHTML só com literal estático (nada vindo da página ou do usuário)
   root.innerHTML = `
     <style>
-      button{font:600 12px system-ui,sans-serif;border:1px solid #8884;border-radius:999px;padding:7px 12px;
-        cursor:pointer;background:#1f1f1f;color:#fff;box-shadow:0 2px 8px #0004;opacity:.85}
-      button:hover{opacity:1} button[disabled]{opacity:.45;cursor:default}
-      .ok{background:#2e7d32}.err{background:#c62828}.busy{background:#555}
+      button{display:inline-flex;align-items:center;gap:7px;font:600 12.5px/1 system-ui,-apple-system,"Segoe UI",sans-serif;
+        border:0;border-radius:999px;padding:7px 13px 7px 8px;cursor:pointer;color:#fff;
+        background:linear-gradient(135deg,#8e5cf7,#5b2bc4);box-shadow:0 4px 14px rgba(70,30,160,.35);
+        opacity:.92;transition:opacity .15s,transform .15s,background .2s}
+      button:hover{opacity:1;transform:translateY(-1px)}
+      button[disabled]{opacity:.5;cursor:default;transform:none}
+      svg{width:20px;height:20px;flex:none}
+      .ok{background:#2e7d32}.err{background:#c62828}.busy{background:#6b5a8e}
     </style>
-    <button id="b" title="">Mem0</button>`;
+    <button id="b" title="">
+      <svg viewBox="0 0 128 128" aria-hidden="true">
+        <g fill="#fff" stroke="#3b1a86" stroke-width="5" stroke-linejoin="round">
+          <path d="M62 26 C52 20 40 23 37 32 C27 32 21 41 24 50 C16 55 16 68 24 73 C20 82 27 92 37 92 C40 101 52 104 62 98 Z"/>
+          <path d="M66 26 C76 20 88 23 91 32 C101 32 107 41 104 50 C112 55 112 68 104 73 C108 82 101 92 91 92 C88 101 76 104 66 98 Z"/>
+        </g>
+        <g fill="none" stroke="#3b1a86" stroke-width="5" stroke-linecap="round">
+          <path d="M37 32 C41 37 48 38 52 35"/><path d="M30 62 C37 60 43 64 45 70"/><path d="M37 92 C40 85 47 82 53 84"/>
+          <path d="M91 32 C87 37 80 38 76 35"/><path d="M98 62 C91 60 85 64 83 70"/><path d="M91 92 C88 85 81 82 75 84"/>
+        </g>
+      </svg>
+      <span id="l"></span>
+    </button>`;
   const btn = root.getElementById("b");
-  const t = (k, fb) => (chrome.i18n && chrome.i18n.getMessage(k)) || fb;
+  const lbl = root.getElementById("l");
   const LABEL = t("btnSave", "Salvar no Mem0");
-  btn.textContent = LABEL;
+  lbl.textContent = LABEL;
   document.documentElement.appendChild(host);
 
   let lastSentKey = "";
   let settings = null;
+  let resetTimer = null;
 
   function flash(cls, label, ms = 2500) {
+    clearTimeout(resetTimer);
     btn.className = cls;
-    btn.textContent = label;
-    if (ms) setTimeout(() => { btn.className = ""; btn.textContent = LABEL; refresh(); }, ms);
+    lbl.textContent = label;
+    if (ms) resetTimer = setTimeout(() => { btn.className = ""; lbl.textContent = LABEL; refresh(); }, ms);
   }
 
   function current() {
@@ -107,7 +138,7 @@
     catch (e) { r = { status: "error", error: String(e) }; }
     if (r.status === "ok") flash("ok", t("btnSaved", "Salvo ✓"));
     else if (r.status === "duplicate") flash("ok", t("btnAlready", "Já salvo ✓"));
-    else if (r.status === "skipped") { btn.className = ""; btn.textContent = LABEL; }
+    else if (r.status === "skipped") { btn.className = ""; lbl.textContent = LABEL; }
     else flash("err", t("btnError", "Erro — veja o ícone"), 4000);
   }
 
@@ -116,33 +147,53 @@
   function refresh() {
     const on = settings && settings.enabled && settings.sites[site];
     host.style.display = on ? "" : "none";
-    btn.disabled = !current() || A.generating();
+    // o clique manual fica liberado mesmo durante a geração: quem decide é o usuário
+    btn.disabled = !current();
     btn.title = settings && settings.mode === "auto" ? t("tipAuto", "Modo automático ligado") : t("tipManual", "Clique para salvar a última troca");
   }
 
   // ---------- detecção de resposta concluída ----------
-  let timer = null;
-  let stableKey = "";
-  function onChange() {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      refresh();
-      if (!settings || settings.mode !== "auto" || !settings.enabled || !settings.sites[site]) return;
-      if (A.generating()) return;
-      const ex = current();
-      if (!ex) return;
-      const k = keyOf(ex);
-      // só envia depois de duas leituras iguais seguidas (resposta parou de crescer)
-      if (k !== stableKey) { stableKey = k; onChange(); return; }
-      if (k !== lastSentKey) send(false);
-    }, 2500);
+  // Verificação periódica (não debounce de mutações: o ChatGPT logado muda o DOM o tempo
+  // todo e um debounce nunca disparava). Envia quando a troca fica igual em duas leituras
+  // seguidas e não há geração em andamento; se o indicador de geração ficar preso, envia
+  // mesmo assim depois de ~30 s sem mudança no texto.
+  const TICK = 2000, STUCK_TICKS = 15;
+  let stableKey = "", stableTicks = 0;
+  function tick() {
+    if (document.hidden) return;
+    refresh();
+    if (!settings || settings.mode !== "auto" || !settings.enabled || !settings.sites[site]) return;
+    const ex = current();
+    if (!ex) return;
+    const k = keyOf(ex);
+    if (k !== stableKey) { stableKey = k; stableTicks = 0; return; }
+    stableTicks++;
+    if (k === lastSentKey) return;
+    if (!A.generating() || stableTicks >= STUCK_TICKS) send(false);
   }
+  setInterval(tick, TICK);
+
+  // ---------- diagnóstico (popup → "Diagnóstico desta aba") ----------
+  chrome.runtime.onMessage.addListener((m, _s, reply) => {
+    if (m.type !== "diagnose") return;
+    const turns = A.turns();
+    const ex = current();
+    reply({
+      site, path: location.pathname, version: chrome.runtime.getManifest().version,
+      settings: settings ? { enabled: settings.enabled, mode: settings.mode, site: settings.sites[site], userId: !!settings.userId } : null,
+      turns: turns.length, roles: turns.slice(-6).map((x) => x.role).join(","),
+      legacyRoles: document.querySelectorAll("[data-message-author-role]").length,
+      newRoles: document.querySelectorAll("[data-message-role]").length,
+      generating: A.generating() || "não",
+      userChars: ex ? ex.user.length : 0, assistantChars: ex ? ex.assistant.length : 0,
+      userStart: ex ? ex.user.slice(0, 50) : "", stableTicks, alreadySent: !!ex && keyOf(ex) === lastSentKey,
+    });
+  });
 
   async function loadSettings() {
     try { settings = (await chrome.runtime.sendMessage({ type: "getState" })).settings; } catch { /* SW dormindo */ }
     refresh();
   }
   chrome.storage.onChanged.addListener((c) => { if (c.settings) loadSettings(); });
-  new MutationObserver(onChange).observe(document.body, { childList: true, subtree: true, characterData: true });
   loadSettings();
 })();

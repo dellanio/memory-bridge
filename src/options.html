@@ -1,38 +1,75 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Memory Bridge for Mem0</title>
-<link rel="stylesheet" href="ui.css"></head><body style="max-width:640px">
-<header class="brand">
-  <img src="../icons/icon48.png" width="48" height="48" alt="">
-  <div><h1 data-i18n="optHeading"></h1><div class="muted" data-i18n="optTitle"></div></div>
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Memory Bridge — Mem0</title><link rel="stylesheet" href="ui.css"></head>
+<body class="options">
+<header class="topbar">
+  <div class="wrap topbar-in">
+    <img src="../icons/icon48.png" width="40" height="40" alt="">
+    <div class="titles"><h1 data-i18n="optHeading"></h1><span data-i18n="optTitle"></span></div>
+    <span class="version" id="version"></span>
+  </div>
 </header>
 
-<h2 data-i18n="secAccount"></h2>
-<label><input type="radio" name="auth" value="oauth"> <span data-i18n="authOauth"></span></label>
-<div id="oauthBox" class="row" style="margin-left:22px">
-  <span id="authState" class="muted"></span>
-  <button id="connect" data-i18n="connect"></button>
-  <button id="disconnect" data-i18n="disconnect"></button>
-</div>
-<label><input type="radio" name="auth" value="apikey"> <span data-i18n="authApikey"></span></label>
-<div id="keyBox" style="margin-left:22px">
-  <label class="muted" data-i18n="apiKeyLabel"></label>
-  <input id="apiKey" type="password" autocomplete="off" spellcheck="false">
-</div>
-<div class="row" style="margin-top:8px"><button id="test" data-i18n="test"></button><span id="testOut" class="muted"></span></div>
+<main class="wrap">
+  <section class="card">
+    <div class="card-head"><h2 data-i18n="secAccount"></h2><span id="authState" class="pill"></span></div>
+    <p class="desc" data-i18n="secAccountDesc"></p>
 
-<h2 data-i18n="secUser"></h2>
-<label class="muted" data-i18n="userIdLabel"></label>
-<input id="userId" type="text" spellcheck="false" placeholder="ex.: maria">
+    <label class="choice">
+      <input type="radio" name="auth" value="oauth">
+      <span class="choice-body"><strong data-i18n="authOauth"></strong></span>
+    </label>
+    <div id="oauthBox" class="indent actions">
+      <button id="connect" class="btn primary" data-i18n="connect"></button>
+      <button id="disconnect" class="btn ghost" data-i18n="disconnect"></button>
+    </div>
 
-<h2 data-i18n="secCapture"></h2>
-<label><input type="radio" name="mode" value="manual"> <span data-i18n="modeManual"></span></label>
-<label><input type="radio" name="mode" value="auto"> <span data-i18n="modeAuto"></span></label>
-<p class="muted" data-i18n="sitesLabel"></p>
-<div class="site"><label><input type="checkbox" id="site_chatgpt"> ChatGPT</label><input type="text" id="app_chatgpt"></div>
-<div class="site"><label><input type="checkbox" id="site_gemini"> Gemini</label><input type="text" id="app_gemini"></div>
-<label><input type="checkbox" id="redact"> <span data-i18n="redactLabel"></span></label>
+    <label class="choice">
+      <input type="radio" name="auth" value="apikey">
+      <span class="choice-body"><strong data-i18n="authApikey"></strong></span>
+    </label>
+    <div id="keyBox" class="indent">
+      <label class="field-label" for="apiKey" data-i18n="apiKeyLabel"></label>
+      <input id="apiKey" class="input" type="password" autocomplete="off" spellcheck="false">
+    </div>
 
-<p class="row"><button id="save" data-i18n="save"></button><span id="saveOut" class="muted"></span></p>
-<p class="muted" data-i18n="privacy"></p>
-<footer>By Dellanio Alencar - <a href="https://dellanio.com" target="_blank" rel="noopener">https://dellanio.com</a></footer>
+    <div class="actions top-gap"><button id="test" class="btn" data-i18n="test"></button><span id="testOut" class="note"></span></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2 data-i18n="secUser"></h2></div>
+    <p class="desc" data-i18n="secUserDesc"></p>
+    <label class="field-label" for="userId" data-i18n="userIdLabel"></label>
+    <input id="userId" class="input" type="text" spellcheck="false" placeholder="ex.: maria">
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2 data-i18n="secCapture"></h2></div>
+    <p class="desc" data-i18n="secCaptureDesc"></p>
+    <div class="tiles">
+      <label class="tile"><input type="radio" name="mode" value="manual"><span data-i18n="modeManual"></span></label>
+      <label class="tile"><input type="radio" name="mode" value="auto"><span data-i18n="modeAuto"></span></label>
+    </div>
+
+    <div class="field-label top-gap" data-i18n="sitesLabel"></div>
+    <div class="sites">
+      <label class="switch-row"><input type="checkbox" id="site_chatgpt"><span>ChatGPT</span></label>
+      <input type="text" id="app_chatgpt" class="input small" spellcheck="false">
+      <label class="switch-row"><input type="checkbox" id="site_gemini"><span>Gemini</span></label>
+      <input type="text" id="app_gemini" class="input small" spellcheck="false">
+    </div>
+
+    <label class="switch-row top-gap"><input type="checkbox" id="redact"><span data-i18n="redactLabel"></span></label>
+  </section>
+
+  <div class="savebar">
+    <span id="saveOut" class="note"></span>
+    <button id="save" class="btn primary" data-i18n="save"></button>
+  </div>
+
+  <p class="privacy" data-i18n="privacy"></p>
+</main>
+
+<footer class="wrap footer">By Dellanio Alencar - <a href="https://dellanio.com" target="_blank" rel="noopener">https://dellanio.com</a></footer>
 <script src="i18n.js"></script><script src="options.js"></script>
 </body></html>

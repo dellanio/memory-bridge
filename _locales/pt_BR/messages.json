@@ -112,5 +112,20 @@
   },
   "optWaiting": {
     "message": "Aguarde... Abrindo Mem0"
+  },
+  "secAccountDesc": {
+    "message": "Como a extensão acessa a sua conta Mem0."
+  },
+  "secUserDesc": {
+    "message": "Toda memória é gravada com este usuário. Use o mesmo ID das suas outras integrações com o Mem0 para manter tudo junto."
+  },
+  "secCaptureDesc": {
+    "message": "Escolha quando as conversas são salvas e em quais sites. O app_id identifica a origem no Mem0."
+  },
+  "popDiag": {
+    "message": "Diagnóstico desta aba"
+  },
+  "diagNoTab": {
+    "message": "A extensão não está ativa nesta aba. Abra o chatgpt.com ou o gemini.google.com no Edge e recarregue a página."
   }
 }
