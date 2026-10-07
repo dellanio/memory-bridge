@@ -4,7 +4,7 @@ Segue as etapas de https://learn.microsoft.com/en-us/microsoft-edge/extensions/p
 Tudo o que estiver em bloco de código é para **copiar e colar** no campo indicado.
 
 Arquivos (pasta `D:\projetos-pessoal\mem0-edge\`):
-- Pacote: `dist\memory-bridge-1.0.1.zip`
+- Pacote: `dist\memory-bridge-1.0.2.zip`
 - Imagens: `store\`
 
 ---
@@ -13,7 +13,7 @@ Arquivos (pasta `D:\projetos-pessoal\mem0-edge\`):
 
 - Protótipo funcionando: ✔
 - Conta de desenvolvedor: **sua parte** (Partner Center → Programas → Microsoft Edge → Introdução, conta **Individual**).
-- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.0.1.zip`
+- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.0.2.zip`
 - Campos do manifest que viram texto da loja (não editáveis no Partner Center):
   - Nome: "Memory Bridge for Mem0" / "Memory Bridge para Mem0"
   - Descrição curta: "Automatically save what matters from your ChatGPT and Gemini chats to your own Mem0 account." / "Salve automaticamente o que importa das suas conversas do ChatGPT e do Gemini na sua própria conta Mem0."
@@ -24,7 +24,7 @@ Partner Center → **Página inicial** → cartão **Edge** → **Create new ext
 
 ## Etapa 3 — Enviar o pacote
 
-Arraste `dist\memory-bridge-1.0.1.zip` → aguarde a validação → **Continue**.
+Arraste `dist\memory-bridge-1.0.2.zip` → aguarde a validação → **Continue**.
 O Partner Center deve listar **dois idiomas** (en e pt_BR). Se aparecer só um, ver "If a single locale appears" na página da Microsoft.
 
 ## Etapa 4 — Disponibilidade (Availability)
@@ -155,5 +155,5 @@ No remote code is used. The only servers contacted are mcp.mem0.ai and api.mem0.
 ## Se der erro
 
 - **Validação do pacote falhou**: mande o print da mensagem.
-- **Só um idioma aparece**: confirme que enviou o 1.0.1 (tem `_locales/en` e `_locales/pt_BR`).
+- **Só um idioma aparece**: confirme que enviou o 1.0.2 (tem `_locales/en` e `_locales/pt_BR`).
 - **Rejeitado por permissão ou marca**: mande o texto da rejeição; a correção vai num novo `.zip` com versão maior (1.0.2…).
