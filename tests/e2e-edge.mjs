@@ -116,6 +116,14 @@ try {
     await P.evaluate(`(() => { document.querySelectorAll('[data-message-role],[data-message-author-role],[data-turn]').forEach(e => { e.removeAttribute('data-message-role'); e.removeAttribute('data-message-author-role'); e.removeAttribute('data-turn') }); return true })()`);
     const d2 = await diag();
     check(d2 && d2.labelTurns >= 2 && d2.userChars > 0 && d2.assistantChars > 0, `fallback por rótulo acha a troca: ${JSON.stringify({ labelTurns: d2.labelTurns, user: d2.userStart, a: d2.assistantChars })}`);
+    // variante logada 1: rótulo da resposta com outro texto ("ChatGPT 5 disse:")
+    await P.evaluate(`(() => { document.querySelectorAll('h4').forEach(h => { if (/ChatGPT disse/.test(h.textContent)) h.textContent = 'ChatGPT 5 disse:' }); return true })()`);
+    const d3 = await diag();
+    check(d3.assistantChars > 0 && d3.roles.includes("assistant"), `rótulo "ChatGPT 5 disse:" vira resposta: ${JSON.stringify({ labels: d3.labels, roles: d3.roles, a: d3.assistantChars })}`);
+    // variante logada 2: resposta sem rótulo nenhum (só "Você disse:" existe)
+    await P.evaluate(`(() => { document.querySelectorAll('h4').forEach(h => { if (/disse/.test(h.textContent) && !/Você/.test(h.textContent)) h.remove() }); return true })()`);
+    const d4 = await diag();
+    check(d4.userChars > 0 && d4.assistantChars > 0, `sem rótulo na resposta, pega o que vem depois da pergunta: ${JSON.stringify({ labels: d4.labels, roles: d4.roles, user: d4.userStart, a: d4.assistantChars })}`);
   }
   if (process.env.E2E_SHOT) {
     const s = await P.send("Page.captureScreenshot", { format: "png" });

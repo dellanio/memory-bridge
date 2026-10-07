@@ -14,19 +14,42 @@
     if (label && t.startsWith(txt(label))) t = t.slice(txt(label).length);
     return t.replace(LABEL_RE, "").trim();
   };
-  // fallback por rótulo de acessibilidade (texto exato, em pt ou en)
-  const USER_LABEL = /^(Você disse|You said)\s*:?$/i, BOT_LABEL = /^(O ChatGPT disse|ChatGPT said)\s*:?$/i;
-  function labelTurns() {
+  // fallback por rótulo de acessibilidade. Logado, o rótulo da resposta pode trazer o nome
+  // do modelo ("ChatGPT disse:", "O ChatGPT 5 disse:"...), então qualquer "<algo> disse:"
+  // que não seja "Você disse:" conta como resposta.
+  const USER_LABEL = /^(Você disse|You said)\s*:?$/i;
+  const ANY_LABEL = /^(.{1,40}?)\s+(disse|said)\s*:?$/i;
+  function labelEls() {
     const out = [];
-    for (const el of document.querySelectorAll("h1,h2,h3,h4,h5,h6,span,div")) {
-      if (el.children.length) continue;
-      const s = (el.textContent || "").trim();
-      const role = USER_LABEL.test(s) ? "user" : BOT_LABEL.test(s) ? "assistant" : null;
-      if (!role) continue;
-      const box = el.closest('article, li, [data-testid^="conversation-turn"]') || el.parentElement;
-      if (box) out.push({ el: box, role });
+    for (const el of document.querySelectorAll("h1,h2,h3,h4,h5,h6,span,div,p,strong,b,label")) {
+      const s = (el.textContent || "").replace(/\s+/g, " ").trim();
+      if (!s || s.length > 50 || !ANY_LABEL.test(s)) continue;
+      out.push({ el, role: USER_LABEL.test(s) ? "user" : "assistant", text: s });
     }
-    return out;
+    // rótulo pode ter filhos (<h6><span>ChatGPT</span> disse:</h6>): fica só o mais interno
+    return out.filter((l) => !out.some((o) => o !== l && l.el.contains(o.el)));
+  }
+  // sobe do rótulo até a "caixa" da mensagem: primeiro até ter conteúdo além do rótulo,
+  // depois só atravessa invólucros (pai com um único filho com texto); nunca entra num
+  // ancestral que contenha outro rótulo.
+  const textKids = (el) => [...el.children].filter((c) => txt(c)).length;
+  function boxFor(label, all) {
+    const fixed = label.closest('li, article, [role="listitem"], [data-testid^="conversation-turn"]');
+    if (fixed && !all.some((o) => o !== label && fixed.contains(o))) return fixed;
+    const lt = txt(label).length;
+    let cur = label;
+    while (cur.parentElement && cur.parentElement !== document.body) {
+      const p = cur.parentElement;
+      if (all.some((o) => o !== label && p.contains(o))) break;
+      if (txt(cur).length > lt + 1 && textKids(p) > 1) break;
+      cur = p;
+    }
+    return txt(cur).length > lt + 1 ? cur : label.parentElement;
+  }
+  function labelTurns() {
+    const labels = labelEls();
+    const els = labels.map((l) => l.el);
+    return labels.map((l) => ({ el: boxFor(l.el, els), role: l.role })).filter((t) => t.el);
   }
   // botão de interromper a geração (aria-label em pt/en); evita casar com "Parar leitura em voz alta" etc.
   const STOP_RE = /^(stop (streaming|generating|response)|parar (transmissão|geração|de gerar|resposta)|interromper (geração|transmissão|resposta))/i;
@@ -63,7 +86,18 @@
         for (let i = turns.length - 1; i >= 0; i--) if (turns[i].role === "assistant") { ai = i; break; }
         let ui = -1;
         for (let i = ai - 1; i >= 0; i--) if (turns[i].role === "user") { ui = i; break; }
-        if (ai < 0 || ui < 0) return null;
+        let u = -1;
+        for (let i = turns.length - 1; i >= 0; i--) if (turns[i].role === "user") { u = i; break; }
+        if (u > ai) {
+          // a última pergunta não tem resposta marcada: a resposta é o que vem logo depois
+          // da caixa dessa pergunta (página logada sem rótulo/atributo na resposta)
+          let box = turns[u].el, next = null;
+          while (box && box !== document.body && !(next = box.nextElementSibling)) box = box.parentElement;
+          const parts = [];
+          for (let n = next; n; n = n.nextElementSibling) { const t2 = txt(n); if (t2) parts.push(t2); }
+          return { user: msgText(turns[u].el), assistant: parts.join("\n\n").replace(LABEL_RE, "").trim() };
+        }
+        if (ui < 0) return null;
         // várias mensagens seguidas do assistente na mesma resposta: junta todas
         const parts = turns.slice(ui + 1).filter((t) => t.role === "assistant").map((t) => msgText(t.el));
         return { user: msgText(turns[ui].el), assistant: parts.filter(Boolean).join("\n\n") };
@@ -217,6 +251,7 @@
       newRoles: document.querySelectorAll("[data-message-role]").length,
       dataTurn: document.querySelectorAll("[data-turn]").length,
       labelTurns: site === "chatgpt" ? labelTurns().length : "-",
+      labels: site === "chatgpt" ? [...new Set(labelEls().map((l) => l.text))].slice(0, 6).join(" | ") : "-",
       convTestIds: document.querySelectorAll('[data-testid^="conversation-turn"]').length,
       buttonTopmost: top === host ? "sim" : (top ? top.tagName.toLowerCase() + (top.id ? "#" + top.id : "") + "." + String(top.className).slice(0, 40) : "nada"),
       popover: host.matches(":popover-open"),
@@ -228,7 +263,9 @@
   let diagTicks = 0;
   setInterval(() => {
     if (document.hidden || diagTicks++ % 3) return;
-    chrome.runtime.sendMessage({ type: "diag", data: diagnose() }).catch(() => {});
+    let data;
+    try { data = diagnose(); } catch (e) { data = { site, at: new Date().toISOString(), erro: String(e && e.stack || e).slice(0, 400) }; }
+    chrome.runtime.sendMessage({ type: "diag", data }).catch(() => {});
   }, TICK);
   window.addEventListener("focus", () => chrome.runtime.sendMessage({ type: "diag", data: diagnose() }).catch(() => {}));
 

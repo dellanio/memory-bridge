@@ -3,7 +3,7 @@
   "name": "__MSG_extName__",
   "short_name": "Memory Bridge",
   "description": "__MSG_extDesc__",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "default_locale": "en",
   "icons": {
     "16": "icons/icon16.png",
