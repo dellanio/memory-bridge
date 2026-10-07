@@ -8,7 +8,7 @@ Imagens: `store/` (geradas por `node tools/store-assets.mjs pt-BR` e `en-US`).
 | Campo | Valor |
 |---|---|
 | Categoria | Produtividade (Productivity) |
-| Política de privacidade (URL) | **pendente** — publicar `PRIVACY.md` num endereço público |
+| Política de privacidade (URL) | https://dellanio.github.io/memory-bridge/privacy.html |
 | Site | https://dellanio.com |
 | Contato de suporte | dellanio@gmail.com |
 | Mercados | Todos |
