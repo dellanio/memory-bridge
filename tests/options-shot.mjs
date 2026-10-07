@@ -36,6 +36,6 @@ try {
   await call("Page.navigate", { url: `chrome-extension://${id}/src/popup.html` });
   await sleep(1200);
   const pop = await call("Page.captureScreenshot", { format: "png" });
-  writeFileSync(OUT.replace(/\.png$/, "-popup.png"), Buffer.from(pop.result.data, "base64"));
+  writeFileSync(OUT.replace(/.png$/, "-popup.png"), Buffer.from(pop.result.data, "base64"));
   ws.close();
 } finally { edge.kill(); await sleep(800); try { rmSync(prof, { recursive: true, force: true }); } catch {} }
