@@ -66,7 +66,7 @@ try {
 
   // envia uma pergunta
   await P.evaluate(`(() => { const t = document.querySelector('#prompt-textarea, textarea, [contenteditable=true]'); t.focus(); return true })()`);
-  await P.send("Input.insertText", { text: "Responda só com a palavra: pitanga. (teste automatizado de extensão)" });
+  await P.send("Input.insertText", { text: process.env.E2E_PROMPT || "Responda só com a palavra: pitanga. (teste automatizado de extensão)" });
   await sleep(500);
   const sent = await P.evaluate(`(() => { const b=[...document.querySelectorAll('button')].find(b => /^(Enviar mensagem|Send message|Send prompt|Enviar prompt)$/i.test(b.getAttribute('aria-label')||'')); if (b && !b.disabled) { b.click(); return true } return false })()`);
   if (!sent) {

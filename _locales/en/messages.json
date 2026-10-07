@@ -127,5 +127,17 @@
   },
   "diagNoTab": {
     "message": "The extension is not active in this tab. Open chatgpt.com or gemini.google.com in Edge and reload the page."
+  },
+  "secFilter": {
+    "message": "Memory filter"
+  },
+  "secFilterDesc": {
+    "message": "Instructions sent with every conversation telling Mem0 what is worth remembering. Leave empty to let Mem0 decide on its own."
+  },
+  "restoreDefault": {
+    "message": "Restore default"
+  },
+  "defaultInstructions": {
+    "message": "Extract only durable facts about the user: preferences, opinions, personal and professional details, projects, decisions, goals and life context. Ignore calculations, greetings, one-off questions, general trivia, generic content from the assistant's answers and any fact that is not about the user. When the user changes a preference or decision, record the new one making clear it replaces the previous one."
   }
 }

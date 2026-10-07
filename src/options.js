@@ -10,6 +10,7 @@ async function load() {
   $("userId").value = s.userId || "";
   for (const k of ["chatgpt", "gemini"]) { $(`site_${k}`).checked = !!s.sites[k]; $(`app_${k}`).value = s.appIds[k] || k; }
   $("redact").checked = !!s.redactSecrets;
+  $("instructions").value = s.instructions || "";
   $("authState").textContent = auth ? t("connected") : t("notConnected");
   $("authState").className = auth ? "pill ok" : "pill";
   $("version").textContent = "v" + chrome.runtime.getManifest().version;
@@ -31,6 +32,7 @@ function collect() {
     sites: { chatgpt: $("site_chatgpt").checked, gemini: $("site_gemini").checked },
     appIds: { chatgpt: $("app_chatgpt").value.trim() || "chatgpt", gemini: $("app_gemini").value.trim() || "gemini" },
     redactSecrets: $("redact").checked,
+    instructions: $("instructions").value.trim(),
   };
 }
 
@@ -60,6 +62,7 @@ $("connect").onclick = async () => {
     load();
   }
 };
+$("restoreInstr").onclick = async () => { $("instructions").value = (await msg({ type: "defaultInstructions" })).text; };
 $("disconnect").onclick = async () => { await msg({ type: "logout" }); load(); };
 $("test").onclick = async () => {
   await msg({ type: "setSettings", patch: collect() });

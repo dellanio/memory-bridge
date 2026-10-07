@@ -13,7 +13,9 @@ const DEFAULTS = {
   sites: { chatgpt: true, gemini: true },
   appIds: { chatgpt: "chatgpt", gemini: "gemini" },
   redactSecrets: true,
+  instructions: null,         // null = instrução padrão no idioma do navegador
 };
+const defaultInstructions = () => chrome.i18n.getMessage("defaultInstructions");
 const LOG_MAX = 30;
 const SENT_MAX = 500;
 
@@ -40,9 +42,11 @@ const originReady = ensureOriginRule().catch((e) => console.warn("regra de Origi
 // ---------- armazenamento ----------
 async function getSettings() {
   const { settings } = await chrome.storage.local.get("settings");
-  return { ...DEFAULTS, ...(settings || {}),
-    sites: { ...DEFAULTS.sites, ...((settings || {}).sites || {}) },
-    appIds: { ...DEFAULTS.appIds, ...((settings || {}).appIds || {}) } };
+  const s = settings || {};
+  return { ...DEFAULTS, ...s,
+    instructions: typeof s.instructions === "string" ? s.instructions : defaultInstructions(),
+    sites: { ...DEFAULTS.sites, ...(s.sites || {}) },
+    appIds: { ...DEFAULTS.appIds, ...(s.appIds || {}) } };
 }
 async function setSettings(patch) {
   const s = await getSettings();
@@ -265,6 +269,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
     switch (msg.type) {
       case "save": return save(msg.exchange, { manual: !!msg.manual });
       case "diag": await chrome.storage.session.set({ [`diag_${msg.data.site}`]: msg.data }); return { ok: true };
+      case "defaultInstructions": return { text: defaultInstructions() };
       case "getDiag": return chrome.storage.session.get(["diag_chatgpt", "diag_gemini"]);
       case "getState": return { settings: await getSettings(), auth: !!(await getAuth())?.accessToken,
         log: (await chrome.storage.local.get("log")).log || [] };

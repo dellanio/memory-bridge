@@ -58,6 +58,19 @@ test("buildAddArgs sem schema cai para messages", () => {
   assert.equal(buildAddArgs(undefined, ex, settings).messages.length, 2);
 });
 
+test("instrução de extração vai como mensagem system (MCP e REST)", () => {
+  const s2 = { ...settings, instructions: "Só fatos sobre o usuário." };
+  const schema = { properties: { messages: { anyOf: [{ type: "array" }, { type: "null" }] }, text: {}, user_id: {} } };
+  const a = buildAddArgs(schema, ex, s2);
+  assert.deepEqual(a.messages[0], { role: "system", content: "Só fatos sobre o usuário." });
+  assert.equal(a.messages.length, 3);
+  const b = restBody(ex, s2);
+  assert.equal(b.messages[0].role, "system");
+  assert.equal(b.custom_instructions, "Só fatos sobre o usuário.");
+  assert.equal(restBody(ex, { ...settings, instructions: "" }).messages.length, 2);
+  assert.equal(restBody(ex, { ...settings, instructions: "" }).custom_instructions, undefined);
+});
+
 test("restBody usa o user_id configurado", () => {
   const b = restBody(ex, settings);
   assert.equal(b.user_id, "dellanio");

@@ -60,11 +60,16 @@ export function exchangeKey(ex) {
   return (h >>> 0).toString(16) + ":" + s.length;
 }
 
-export function messagesOf(ex) {
-  return [
+// A instrução de extração vai como mensagem "system": o Mem0 a usa para decidir o que
+// guardar (testado na API REST e no servidor MCP: ignora cálculos/saudações/perguntas
+// gerais e mantém fatos sobre o usuário).
+export function messagesOf(ex, instructions = "") {
+  const msgs = [
     { role: "user", content: ex.user },
     { role: "assistant", content: ex.assistant },
   ];
+  const i = String(instructions || "").trim();
+  return i ? [{ role: "system", content: i }, ...msgs] : msgs;
 }
 
 export function metadataOf(ex) {
@@ -83,12 +88,14 @@ export function appIdFor(ex, settings) {
 
 // Corpo para a API REST (modo chave de API).
 export function restBody(ex, settings) {
-  return {
-    messages: messagesOf(ex),
+  const body = {
+    messages: messagesOf(ex, settings.instructions),
     user_id: settings.userId,
     app_id: appIdFor(ex, settings),
     metadata: metadataOf(ex),
   };
+  if (settings.instructions && settings.instructions.trim()) body.custom_instructions = settings.instructions.trim();
+  return body;
 }
 
 // o schema pode declarar o tipo direto ou via anyOf/oneOf (ex.: array | null)
@@ -108,12 +115,15 @@ export function buildAddArgs(schema, ex, settings) {
   const msgKey = pick("messages");
   const textKey = pick("text", "content", "memory", "data");
   if (msgKey && (acceptsArray(props[msgKey]) || !textKey)) {
-    args[msgKey] = messagesOf(ex);
+    args[msgKey] = messagesOf(ex, settings.instructions);
   } else if (textKey) {
-    args[textKey] = `User: ${ex.user}\n\nAssistant: ${ex.assistant}`;
+    const i = String(settings.instructions || "").trim();
+    args[textKey] = (i ? `[${i}]\n\n` : "") + `User: ${ex.user}\n\nAssistant: ${ex.assistant}`;
   } else {
-    args.messages = messagesOf(ex);
+    args.messages = messagesOf(ex, settings.instructions);
   }
+  const ciKey = pick("custom_instructions", "customInstructions");
+  if (ciKey && settings.instructions) args[ciKey] = settings.instructions;
   const userKey = pick("user_id", "userId");
   if (userKey && settings.userId) args[userKey] = settings.userId;
   const appKey = pick("app_id", "appId");

@@ -127,5 +127,17 @@
   },
   "diagNoTab": {
     "message": "A extensão não está ativa nesta aba. Abra o chatgpt.com ou o gemini.google.com no Edge e recarregue a página."
+  },
+  "secFilter": {
+    "message": "Filtro de memórias"
+  },
+  "secFilterDesc": {
+    "message": "Instruções enviadas junto com cada conversa dizendo ao Mem0 o que vale guardar. Deixe vazio para o Mem0 decidir sozinho."
+  },
+  "restoreDefault": {
+    "message": "Restaurar padrão"
+  },
+  "defaultInstructions": {
+    "message": "Extraia apenas fatos duradouros sobre o usuário: preferências, opiniões, dados pessoais e profissionais, projetos, decisões, metas e contexto de vida. Ignore cálculos, saudações, perguntas pontuais, curiosidades gerais, conteúdo genérico das respostas do assistente e qualquer fato que não seja sobre o usuário. Quando o usuário mudar uma preferência ou decisão, registre a nova deixando claro que ela substitui a anterior."
   }
 }
