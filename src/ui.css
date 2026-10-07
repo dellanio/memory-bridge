@@ -6,3 +6,7 @@ button{padding:6px 12px;border-radius:6px;border:1px solid #8886;cursor:pointer;
 .muted{opacity:.7;font-size:12px} .ok{color:#2e7d32} .err{color:#c62828}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .site{display:grid;grid-template-columns:110px 200px;gap:8px;align-items:center;margin:4px 0}
 ul{list-style:none;padding:0;margin:0} li{padding:5px 0;border-bottom:1px solid #8883;font-size:12px}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:8px} .brand h1{margin:0}
+footer{margin-top:28px;padding-top:10px;border-top:1px solid #8883;font-size:12px;opacity:.75}
+footer a{color:inherit}
+.wait{color:#5b2bc4;font-weight:600} @media (prefers-color-scheme:dark){.wait{color:#b79cff}}

@@ -106,5 +106,11 @@
   },
   "needUser": {
     "message": "Configure seu User ID nas Configurações."
+  },
+  "optHeading": {
+    "message": "Integração com Mem0"
+  },
+  "optWaiting": {
+    "message": "Aguarde... Abrindo Mem0"
   }
 }

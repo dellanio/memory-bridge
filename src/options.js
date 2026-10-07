@@ -41,8 +41,20 @@ function show(el, r, okText) {
 document.querySelectorAll("input[name=auth]").forEach((e) => e.addEventListener("change", toggle));
 $("save").onclick = async () => { show($("saveOut"), await msg({ type: "setSettings", patch: collect() }), t("saved")); };
 $("connect").onclick = async () => {
-  await msg({ type: "setSettings", patch: collect() });
-  show($("testOut"), await msg({ type: "login" }), t("connected")); load();
+  const b = $("connect");
+  if (b.disabled) return;
+  b.disabled = true;                       // evita vários cliques enquanto a janela do Mem0 abre
+  $("authState").textContent = t("optWaiting");
+  $("authState").className = "wait";
+  $("testOut").textContent = "";
+  try {
+    await msg({ type: "setSettings", patch: collect() });
+    const r = await msg({ type: "login" });
+    if (r && r.ok === false) show($("testOut"), r);
+  } finally {
+    b.disabled = false;
+    load();
+  }
 };
 $("disconnect").onclick = async () => { await msg({ type: "logout" }); load(); };
 $("test").onclick = async () => {
