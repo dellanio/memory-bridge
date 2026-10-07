@@ -24,7 +24,8 @@ const edge = spawn(EDGE, [`--user-data-dir=${prof}`, `--remote-debugging-port=${
 async function targets() { return (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json(); }
 function cdp(wsUrl) {
   const ws = new WebSocket(wsUrl); let id = 0; const pending = new Map();
-  ws.onmessage = (e) => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); } };
+  ws.onmessage = (e) => { const m = JSON.parse(e.data); if (m.id && pending.has(m.id)) { pending.get(m.id)(m); pending.delete(m.id); }
+    else if (process.env.E2E_DEBUG && m.method === "Runtime.exceptionThrown") console.log("  [exceção]", JSON.stringify(m.params.exceptionDetails).slice(0, 400)); };
   const ready = new Promise((r) => (ws.onopen = r));
   const send = async (method, params = {}) => { await ready; const i = ++id; ws.send(JSON.stringify({ id: i, method, params }));
     const m = await new Promise((r) => pending.set(i, r)); if (m.error) throw new Error(`${method}: ${m.error.message}`); return m.result; };
@@ -55,6 +56,7 @@ try {
   const page = (await targets()).find((t) => t.type === "page");
   const P = cdp(page.webSocketDebuggerUrl);
   await P.send("Page.enable");
+  if (process.env.E2E_DEBUG) await P.send("Runtime.enable");
   await P.send("Page.navigate", { url: "https://chatgpt.com/" });
   await sleep(12000);
   const box = await P.evaluate(`(() => { const t = document.querySelector('#prompt-textarea, textarea, [contenteditable=true]'); return t ? 'ok' : document.title })()`);
@@ -94,6 +96,8 @@ try {
   } else {
     // modo manual sem user_id: clicar no botão deve registrar o aviso de configuração
     await sleep(4000);
+    // simula o que o ChatGPT logado faz: uma camada transparente cobrindo a página com z-index máximo
+    await P.evaluate(`(() => { const d=document.createElement('div'); d.id='overlay-teste'; d.style.cssText='position:fixed;inset:0;z-index:2147483647;background:transparent'; document.body.appendChild(d); return true })()`);
     const pos = await P.evaluate(`(() => { const h=[...document.documentElement.children].find(e => e.tagName==='DIV' && e.style.bottom==='88px'); const r=h.getBoundingClientRect(); return {x:r.left+r.width/2, y:r.top+r.height/2, w:r.width, h:r.height, display:h.style.display, hit:(document.elementFromPoint(r.left+r.width/2, r.top+r.height/2)||{}).tagName} })()`);
     console.log("  botão:", JSON.stringify(pos));
     const doc = await P.send("DOM.getDocument", { depth: -1, pierce: true });
@@ -104,6 +108,14 @@ try {
     await sleep(2000);
     const log = (await S.evaluate("chrome.storage.local.get('log')")).log || [];
     check(log[0] && /user/i.test(log[0].preview), `clique sem user_id gera aviso: ${JSON.stringify(log[0])}`);
+    // diagnóstico pela aba + fallback por rótulo ("Você disse:") quando os atributos somem
+    const diag = async () => { await sleep(6500); const d = await S.evaluate(`chrome.storage.session.get("diag_chatgpt")`); return (d && d.diag_chatgpt) || { erro: "sem diagnóstico" }; };
+    let d1 = await diag();
+    console.log("  diagnóstico:", JSON.stringify(d1));
+    check(d1 && d1.popover === true && d1.userChars > 0, "diagnóstico responde e o botão está na top layer");
+    await P.evaluate(`(() => { document.querySelectorAll('[data-message-role],[data-message-author-role],[data-turn]').forEach(e => { e.removeAttribute('data-message-role'); e.removeAttribute('data-message-author-role'); e.removeAttribute('data-turn') }); return true })()`);
+    const d2 = await diag();
+    check(d2 && d2.labelTurns >= 2 && d2.userChars > 0 && d2.assistantChars > 0, `fallback por rótulo acha a troca: ${JSON.stringify({ labelTurns: d2.labelTurns, user: d2.userStart, a: d2.assistantChars })}`);
   }
   if (process.env.E2E_SHOT) {
     const s = await P.send("Page.captureScreenshot", { format: "png" });

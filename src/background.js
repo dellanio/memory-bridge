@@ -264,6 +264,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
   (async () => {
     switch (msg.type) {
       case "save": return save(msg.exchange, { manual: !!msg.manual });
+      case "diag": await chrome.storage.session.set({ [`diag_${msg.data.site}`]: msg.data }); return { ok: true };
+      case "getDiag": return chrome.storage.session.get(["diag_chatgpt", "diag_gemini"]);
       case "getState": return { settings: await getSettings(), auth: !!(await getAuth())?.accessToken,
         log: (await chrome.storage.local.get("log")).log || [] };
       case "setSettings": await setSettings(msg.patch); return { ok: true };

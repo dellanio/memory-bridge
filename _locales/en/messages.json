@@ -21,7 +21,7 @@
     "message": "Error — see toolbar icon"
   },
   "btnNothing": {
-    "message": "Nothing to save"
+    "message": "Nothing to save — use Diagnose"
   },
   "tipAuto": {
     "message": "Auto mode is on"

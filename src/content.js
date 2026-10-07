@@ -14,6 +14,20 @@
     if (label && t.startsWith(txt(label))) t = t.slice(txt(label).length);
     return t.replace(LABEL_RE, "").trim();
   };
+  // fallback por rótulo de acessibilidade (texto exato, em pt ou en)
+  const USER_LABEL = /^(Você disse|You said)\s*:?$/i, BOT_LABEL = /^(O ChatGPT disse|ChatGPT said)\s*:?$/i;
+  function labelTurns() {
+    const out = [];
+    for (const el of document.querySelectorAll("h1,h2,h3,h4,h5,h6,span,div")) {
+      if (el.children.length) continue;
+      const s = (el.textContent || "").trim();
+      const role = USER_LABEL.test(s) ? "user" : BOT_LABEL.test(s) ? "assistant" : null;
+      if (!role) continue;
+      const box = el.closest('article, li, [data-testid^="conversation-turn"]') || el.parentElement;
+      if (box) out.push({ el: box, role });
+    }
+    return out;
+  }
   // botão de interromper a geração (aria-label em pt/en); evita casar com "Parar leitura em voz alta" etc.
   const STOP_RE = /^(stop (streaming|generating|response)|parar (transmissão|geração|de gerar|resposta)|interromper (geração|transmissão|resposta))/i;
   const stopButton = () => document.querySelector('[data-testid="stop-button"]')
@@ -24,11 +38,17 @@
       match: /(^|\.)chatgpt\.com$|(^|\.)chat\.openai\.com$/,
       conversationId: () => (location.pathname.match(/\/u?c\/([\w-]+)/) || [])[1]
         || (document.querySelector("[data-conversation-id]") || {}).dataset?.conversationId || null,
-      // layout novo: li[data-message-role]; layout clássico (logado): [data-message-author-role]
-      turns: () => [...document.querySelectorAll("[data-message-role], [data-message-author-role]")]
-        .map((el) => ({ el, role: el.dataset.messageRole || el.dataset.messageAuthorRole }))
+      // Vários layouts convivem: li[data-message-role] (novo), article[data-turn] e
+      // [data-message-author-role] (logado/clássico). Se nenhum existir, usa os rótulos de
+      // acessibilidade "Você disse:" / "O ChatGPT disse:" para achar cada mensagem.
+      turns() {
+        let list = [...document.querySelectorAll("[data-message-role], [data-message-author-role], [data-turn]")]
+          .map((el) => ({ el, role: el.dataset.messageRole || el.dataset.messageAuthorRole || el.dataset.turn }))
+          .filter((t) => t.role === "user" || t.role === "assistant");
+        if (!list.length) list = labelTurns();
         // um nó pode conter outro com o mesmo papel: fica só o mais externo
-        .filter((t, i, all) => !all.some((o, j) => j !== i && o.el !== t.el && o.el.contains(t.el))),
+        return list.filter((t, i, all) => !all.some((o, j) => j !== i && o.el !== t.el && o.el.contains(t.el)));
+      },
       generating() {
         const s = stopButton();
         if (s) return "botão " + (s.getAttribute("aria-label") || s.dataset.testid);
@@ -76,7 +96,10 @@
 
   // ---------- botão flutuante (Shadow DOM: não herda nem quebra o CSS do site) ----------
   const host = document.createElement("div");
-  host.style.cssText = "position:fixed;right:18px;bottom:88px;z-index:2147483646";
+  // Popover API: o botão vai para a "top layer" do navegador, acima de qualquer camada
+  // do site (o ChatGPT logado cobre a página com elementos de z-index alto).
+  host.style.cssText = "position:fixed;inset:auto 18px 88px auto;z-index:2147483647;margin:0;padding:0;border:0;background:transparent;overflow:visible;width:auto;height:auto";
+  host.setAttribute("popover", "manual");
   const root = host.attachShadow({ mode: "closed" });
   // innerHTML só com literal estático (nada vindo da página ou do usuário)
   root.innerHTML = `
@@ -86,7 +109,7 @@
         background:linear-gradient(135deg,#8e5cf7,#5b2bc4);box-shadow:0 4px 14px rgba(70,30,160,.35);
         opacity:.92;transition:opacity .15s,transform .15s,background .2s}
       button:hover{opacity:1;transform:translateY(-1px)}
-      button[disabled]{opacity:.5;cursor:default;transform:none}
+      button.idle{opacity:.6}
       svg{width:20px;height:20px;flex:none}
       .ok{background:#2e7d32}.err{background:#c62828}.busy{background:#6b5a8e}
     </style>
@@ -108,6 +131,8 @@
   const LABEL = t("btnSave", "Salvar no Mem0");
   lbl.textContent = LABEL;
   document.documentElement.appendChild(host);
+  const raise = () => { try { if (host.isConnected && !host.matches(":popover-open")) host.showPopover(); } catch { /* sem Popover API */ } };
+  raise();
 
   let lastSentKey = "";
   let settings = null;
@@ -130,7 +155,7 @@
 
   async function send(manual) {
     const ex = current();
-    if (!ex) { if (manual) flash("err", t("btnNothing", "Nada para salvar")); return; }
+    if (!ex) { if (manual) flash("err", t("btnNothing", "Nada para salvar — use o Diagnóstico"), 3500); return; }
     lastSentKey = keyOf(ex);
     flash("busy", t("btnSaving", "Salvando…"), 0);
     let r;
@@ -146,9 +171,11 @@
 
   function refresh() {
     const on = settings && settings.enabled && settings.sites[site];
+    if (!host.isConnected) document.documentElement.appendChild(host);
     host.style.display = on ? "" : "none";
-    // o clique manual fica liberado mesmo durante a geração: quem decide é o usuário
-    btn.disabled = !current();
+    if (on) raise();
+    // sempre clicável (mesmo durante a geração ou sem troca detectada): o clique mostra o motivo
+    btn.classList.toggle("idle", !current());
     btn.title = settings && settings.mode === "auto" ? t("tipAuto", "Modo automático ligado") : t("tipManual", "Clique para salvar a última troca");
   }
 
@@ -173,22 +200,37 @@
   }
   setInterval(tick, TICK);
 
-  // ---------- diagnóstico (popup → "Diagnóstico desta aba") ----------
-  chrome.runtime.onMessage.addListener((m, _s, reply) => {
-    if (m.type !== "diagnose") return;
+  // ---------- diagnóstico ----------
+  // O content script publica um retrato do que enxerga (a cada ~6 s) no service worker,
+  // e o popup mostra o mais recente. Empurrar daqui é mais confiável que o popup
+  // perguntar à aba (tabs.sendMessage falhava com "Receiving end does not exist").
+  function diagnose() {
     const turns = A.turns();
     const ex = current();
-    reply({
-      site, path: location.pathname, version: chrome.runtime.getManifest().version,
+    const r = host.getBoundingClientRect();
+    const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return {
+      site, path: location.pathname, at: new Date().toISOString(), version: chrome.runtime.getManifest().version,
       settings: settings ? { enabled: settings.enabled, mode: settings.mode, site: settings.sites[site], userId: !!settings.userId } : null,
       turns: turns.length, roles: turns.slice(-6).map((x) => x.role).join(","),
       legacyRoles: document.querySelectorAll("[data-message-author-role]").length,
       newRoles: document.querySelectorAll("[data-message-role]").length,
+      dataTurn: document.querySelectorAll("[data-turn]").length,
+      labelTurns: site === "chatgpt" ? labelTurns().length : "-",
+      convTestIds: document.querySelectorAll('[data-testid^="conversation-turn"]').length,
+      buttonTopmost: top === host ? "sim" : (top ? top.tagName.toLowerCase() + (top.id ? "#" + top.id : "") + "." + String(top.className).slice(0, 40) : "nada"),
+      popover: host.matches(":popover-open"),
       generating: A.generating() || "não",
       userChars: ex ? ex.user.length : 0, assistantChars: ex ? ex.assistant.length : 0,
       userStart: ex ? ex.user.slice(0, 50) : "", stableTicks, alreadySent: !!ex && keyOf(ex) === lastSentKey,
-    });
-  });
+    };
+  }
+  let diagTicks = 0;
+  setInterval(() => {
+    if (document.hidden || diagTicks++ % 3) return;
+    chrome.runtime.sendMessage({ type: "diag", data: diagnose() }).catch(() => {});
+  }, TICK);
+  window.addEventListener("focus", () => chrome.runtime.sendMessage({ type: "diag", data: diagnose() }).catch(() => {}));
 
   async function loadSettings() {
     try { settings = (await chrome.runtime.sendMessage({ type: "getState" })).settings; } catch { /* SW dormindo */ }
