@@ -1,0 +1,110 @@
+{
+  "extName": {
+    "message": "Memory Bridge para Mem0 (não oficial)"
+  },
+  "extDesc": {
+    "message": "Salve suas conversas do ChatGPT e do Gemini na sua própria conta Mem0, com o seu user ID."
+  },
+  "btnSave": {
+    "message": "Salvar no Mem0"
+  },
+  "btnSaving": {
+    "message": "Salvando…"
+  },
+  "btnSaved": {
+    "message": "Salvo ✓"
+  },
+  "btnAlready": {
+    "message": "Já salvo ✓"
+  },
+  "btnError": {
+    "message": "Erro — veja o ícone"
+  },
+  "btnNothing": {
+    "message": "Nada para salvar"
+  },
+  "tipAuto": {
+    "message": "Modo automático ligado"
+  },
+  "tipManual": {
+    "message": "Clique para salvar a última troca"
+  },
+  "optTitle": {
+    "message": "Configurações"
+  },
+  "secAccount": {
+    "message": "Conta Mem0"
+  },
+  "authOauth": {
+    "message": "Entrar com a conta Mem0 (OAuth, recomendado)"
+  },
+  "authApikey": {
+    "message": "Chave de API (avançado)"
+  },
+  "connect": {
+    "message": "Conectar"
+  },
+  "disconnect": {
+    "message": "Desconectar"
+  },
+  "test": {
+    "message": "Testar conexão"
+  },
+  "connected": {
+    "message": "Conectado"
+  },
+  "notConnected": {
+    "message": "Não conectado"
+  },
+  "apiKeyLabel": {
+    "message": "Chave de API do Mem0 (fica só neste navegador)"
+  },
+  "secUser": {
+    "message": "Quem você é no Mem0"
+  },
+  "userIdLabel": {
+    "message": "User ID (obrigatório) — as memórias são gravadas com este user_id"
+  },
+  "secCapture": {
+    "message": "Captura"
+  },
+  "modeManual": {
+    "message": "Manual — só quando eu clicar em “Salvar no Mem0”"
+  },
+  "modeAuto": {
+    "message": "Automático — salvar toda resposta concluída"
+  },
+  "sitesLabel": {
+    "message": "Sites e app_id"
+  },
+  "redactLabel": {
+    "message": "Ocultar segredos óbvios (chaves, tokens, cartões) antes de enviar"
+  },
+  "save": {
+    "message": "Salvar"
+  },
+  "saved": {
+    "message": "Salvo."
+  },
+  "privacy": {
+    "message": "O que é enviado: só a pergunta e a resposta que você salvar, mais site, ID da conversa e URL, direto para o Mem0. Nada vai para outro lugar."
+  },
+  "popEnabled": {
+    "message": "Ativo"
+  },
+  "popRecent": {
+    "message": "Atividade recente"
+  },
+  "popEmpty": {
+    "message": "Nada enviado ainda."
+  },
+  "popOptions": {
+    "message": "Configurações"
+  },
+  "popClear": {
+    "message": "Limpar"
+  },
+  "needUser": {
+    "message": "Configure seu User ID nas Configurações."
+  }
+}

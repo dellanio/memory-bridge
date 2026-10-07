@@ -1,0 +1,6 @@
+{
+  "name": "mem0-edge-bridge",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test tests/*.test.mjs" }
+}

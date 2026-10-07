@@ -1,0 +1,110 @@
+{
+  "extName": {
+    "message": "Memory Bridge for Mem0 (unofficial)"
+  },
+  "extDesc": {
+    "message": "Save your ChatGPT and Gemini conversations to your own Mem0 account, with your own user ID."
+  },
+  "btnSave": {
+    "message": "Save to Mem0"
+  },
+  "btnSaving": {
+    "message": "Saving…"
+  },
+  "btnSaved": {
+    "message": "Saved ✓"
+  },
+  "btnAlready": {
+    "message": "Already saved ✓"
+  },
+  "btnError": {
+    "message": "Error — see toolbar icon"
+  },
+  "btnNothing": {
+    "message": "Nothing to save"
+  },
+  "tipAuto": {
+    "message": "Auto mode is on"
+  },
+  "tipManual": {
+    "message": "Click to save the last exchange"
+  },
+  "optTitle": {
+    "message": "Settings"
+  },
+  "secAccount": {
+    "message": "Mem0 account"
+  },
+  "authOauth": {
+    "message": "Sign in with Mem0 (OAuth, recommended)"
+  },
+  "authApikey": {
+    "message": "API key (advanced)"
+  },
+  "connect": {
+    "message": "Connect"
+  },
+  "disconnect": {
+    "message": "Disconnect"
+  },
+  "test": {
+    "message": "Test connection"
+  },
+  "connected": {
+    "message": "Connected"
+  },
+  "notConnected": {
+    "message": "Not connected"
+  },
+  "apiKeyLabel": {
+    "message": "Mem0 API key (stored only in this browser)"
+  },
+  "secUser": {
+    "message": "Who you are in Mem0"
+  },
+  "userIdLabel": {
+    "message": "User ID (required) — memories are saved under this user_id"
+  },
+  "secCapture": {
+    "message": "Capture"
+  },
+  "modeManual": {
+    "message": "Manual — only when I click “Save to Mem0”"
+  },
+  "modeAuto": {
+    "message": "Automatic — save every finished answer"
+  },
+  "sitesLabel": {
+    "message": "Sites and app_id"
+  },
+  "redactLabel": {
+    "message": "Hide obvious secrets (API keys, tokens, card numbers) before sending"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "saved": {
+    "message": "Saved."
+  },
+  "privacy": {
+    "message": "What is sent: only the question and answer you save, plus site, conversation ID and URL, directly to Mem0. Nothing goes anywhere else."
+  },
+  "popEnabled": {
+    "message": "Enabled"
+  },
+  "popRecent": {
+    "message": "Recent activity"
+  },
+  "popEmpty": {
+    "message": "Nothing sent yet."
+  },
+  "popOptions": {
+    "message": "Settings"
+  },
+  "popClear": {
+    "message": "Clear"
+  },
+  "needUser": {
+    "message": "Set your User ID in Settings."
+  }
+}

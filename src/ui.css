@@ -1,0 +1,8 @@
+body{font:14px system-ui,sans-serif;margin:0;padding:16px;color:#1b1b1b;background:#fafafa}
+@media (prefers-color-scheme:dark){body{color:#eee;background:#1d1d1d}input[type=text],input[type=password]{background:#2a2a2a;color:#eee;border-color:#555}}
+h1{font-size:18px;margin:0 0 12px} h2{font-size:14px;margin:18px 0 8px}
+label{display:block;margin:6px 0} input[type=text],input[type=password]{width:100%;max-width:420px;padding:6px 8px;border:1px solid #bbb;border-radius:6px;box-sizing:border-box}
+button{padding:6px 12px;border-radius:6px;border:1px solid #8886;cursor:pointer;margin-right:6px}
+.muted{opacity:.7;font-size:12px} .ok{color:#2e7d32} .err{color:#c62828}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap} .site{display:grid;grid-template-columns:110px 200px;gap:8px;align-items:center;margin:4px 0}
+ul{list-style:none;padding:0;margin:0} li{padding:5px 0;border-bottom:1px solid #8883;font-size:12px}
