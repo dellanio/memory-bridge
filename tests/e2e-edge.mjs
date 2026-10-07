@@ -8,7 +8,11 @@ import { join, resolve } from "node:path";
 const EDGE = "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
 const EXT = resolve(import.meta.dirname, "..");
 const PORT = 9333;
-const restUser = process.argv.includes("--rest-user") ? process.argv[process.argv.indexOf("--rest-user") + 1] : null;
+const arg = (n) => (process.argv.includes(n) ? process.argv[process.argv.indexOf(n) + 1] : null);
+// --rest-user <u>: envia pela API REST; --mcp-user <u>: envia pelo servidor MCP (a chave de API vale como bearer,
+// o que exercita o mesmo caminho do OAuth depois do login). Ambos exigem MEM0_API_KEY no ambiente.
+const restUser = arg("--rest-user") || arg("--mcp-user");
+const viaMcp = !!arg("--mcp-user");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const prof = mkdtempSync(join(process.env.TMPDIR || tmpdir(), "edge-e2e-"));
 
@@ -42,7 +46,10 @@ try {
   console.log("  redirect OAuth:", await S.evaluate("chrome.identity.getRedirectURL()"));
 
   if (restUser) {
-    await S.evaluate(`chrome.storage.local.set({settings:{authMode:"apikey",apiKey:${JSON.stringify(process.env.MEM0_API_KEY || "")},userId:${JSON.stringify(restUser)},mode:"auto"}})`);
+    const key = JSON.stringify(process.env.MEM0_API_KEY || "");
+    await S.evaluate(viaMcp
+      ? `chrome.storage.local.set({settings:{authMode:"oauth",userId:${JSON.stringify(restUser)},mode:"auto"},auth:{clientId:"e2e",accessToken:${key},expiresAt:Date.now()+36e5}})`
+      : `chrome.storage.local.set({settings:{authMode:"apikey",apiKey:${key},userId:${JSON.stringify(restUser)},mode:"auto"}})`);
   }
 
   const page = (await targets()).find((t) => t.type === "page");
@@ -83,7 +90,7 @@ try {
     let log = [];
     for (let i = 0; i < 20; i++) { await sleep(1500); log = (await S.evaluate("chrome.storage.local.get('log')")).log || []; if (log.length) break; }
     console.log("  log:", JSON.stringify(log.slice(0, 2)));
-    check(log[0] && log[0].status === "ok", "envio automático para o Mem0 (REST) com o user_id configurado");
+    check(log[0] && log[0].status === "ok", `envio automático para o Mem0 (${viaMcp ? "MCP" : "REST"}) com o user_id configurado`);
   } else {
     // modo manual sem user_id: clicar no botão deve registrar o aviso de configuração
     await sleep(4000);

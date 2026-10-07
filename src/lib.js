@@ -91,6 +91,13 @@ export function restBody(ex, settings) {
   };
 }
 
+// o schema pode declarar o tipo direto ou via anyOf/oneOf (ex.: array | null)
+export function acceptsArray(prop) {
+  if (!prop) return false;
+  if (prop.type === "array" || (Array.isArray(prop.type) && prop.type.includes("array"))) return true;
+  return [...(prop.anyOf || []), ...(prop.oneOf || [])].some(acceptsArray);
+}
+
 // Argumentos do tool `add_memory` montados a partir do inputSchema que o servidor
 // MCP anunciar: aceita snake_case ou camelCase e `messages` ou texto.
 export function buildAddArgs(schema, ex, settings) {
@@ -100,7 +107,7 @@ export function buildAddArgs(schema, ex, settings) {
   const args = {};
   const msgKey = pick("messages");
   const textKey = pick("text", "content", "memory", "data");
-  if (msgKey && (props[msgKey].type === "array" || !textKey)) {
+  if (msgKey && (acceptsArray(props[msgKey]) || !textKey)) {
     args[msgKey] = messagesOf(ex);
   } else if (textKey) {
     args[textKey] = `User: ${ex.user}\n\nAssistant: ${ex.assistant}`;

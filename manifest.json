@@ -3,7 +3,7 @@
   "name": "__MSG_extName__",
   "short_name": "Mem0 Bridge",
   "description": "__MSG_extDesc__",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "default_locale": "en",
   "icons": {
     "16": "icons/icon16.png",
@@ -13,7 +13,8 @@
   },
   "permissions": [
     "storage",
-    "identity"
+    "identity",
+    "declarativeNetRequestWithHostAccess"
   ],
   "host_permissions": [
     "https://mcp.mem0.ai/*",

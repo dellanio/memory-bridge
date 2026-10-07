@@ -35,6 +35,18 @@ test("buildAddArgs: schema snake_case com messages", () => {
   assert.equal(a.metadata.site, "gemini");
 });
 
+test("buildAddArgs: schema real do mcp.mem0.ai (anyOf array|null) usa messages", () => {
+  const schema = { properties: {
+    text: { anyOf: [{ type: "string" }, { type: "null" }] },
+    messages: { anyOf: [{ type: "array", items: { type: "object" } }, { type: "null" }] },
+    user_id: { anyOf: [{ type: "string" }, { type: "null" }] }, agent_id: {}, app_id: {}, run_id: {}, metadata: {}, infer: {} } };
+  const a = buildAddArgs(schema, ex, settings);
+  assert.equal(a.messages.length, 2);
+  assert.equal(a.text, undefined);
+  assert.equal(a.user_id, "dellanio");
+  assert.equal(a.app_id, "gemini-pessoal");
+});
+
 test("buildAddArgs: schema camelCase só com texto", () => {
   const a = buildAddArgs({ properties: { text: {}, userId: {} } }, ex, { userId: "maria" });
   assert.equal(a.userId, "maria");

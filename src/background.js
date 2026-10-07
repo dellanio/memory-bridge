@@ -17,6 +17,26 @@ const DEFAULTS = {
 const LOG_MAX = 30;
 const SENT_MAX = 500;
 
+// ---------- Origin ----------
+// O servidor MCP do Mem0 responde 403 "Invalid Origin header" a qualquer pedido com
+// Origin (proteção contra DNS rebinding). O fetch do service worker sempre manda
+// Origin: chrome-extension://<id>, e o fetch não deixa remover; então uma regra de
+// sessão do declarativeNetRequest tira o Origin só dos pedidos sem aba (a própria
+// extensão) para mcp.mem0.ai.
+const STRIP_ORIGIN_RULE = 1;
+async function ensureOriginRule() {
+  await chrome.declarativeNetRequest.updateSessionRules({
+    removeRuleIds: [STRIP_ORIGIN_RULE],
+    addRules: [{
+      id: STRIP_ORIGIN_RULE, priority: 1,
+      action: { type: "modifyHeaders", requestHeaders: [{ header: "origin", operation: "remove" }] },
+      condition: { requestDomains: ["mcp.mem0.ai"], tabIds: [chrome.tabs.TAB_ID_NONE],
+        resourceTypes: ["xmlhttprequest", "other"] },
+    }],
+  });
+}
+const originReady = ensureOriginRule().catch((e) => console.warn("regra de Origin:", e));
+
 // ---------- armazenamento ----------
 async function getSettings() {
   const { settings } = await chrome.storage.local.get("settings");
@@ -148,13 +168,19 @@ async function logout() {
 // ---------- cliente MCP mínimo (Streamable HTTP) ----------
 let rpcId = 0;
 async function mcpPost(token, sessionId, payload) {
+  await originReady;
   const headers = { "Content-Type": "application/json",
     Accept: "application/json, text/event-stream", Authorization: `Bearer ${token}` };
   if (sessionId) headers["Mcp-Session-Id"] = sessionId;
   const r = await fetch(MCP_URL, { method: "POST", headers, body: JSON.stringify(payload) });
-  if (r.status === 401) throw new Error("Mem0 recusou o login (401): conecte de novo");
-  if (!r.ok && r.status !== 202) throw new Error(`MCP: HTTP ${r.status}`);
   const text = await r.text();
+  if (!r.ok && r.status !== 202) {
+    // detalhe para diagnóstico: corpo e www-authenticate (ex.: insufficient_scope), sem o token
+    const why = [r.headers.get("www-authenticate"), text.replace(/\s+/g, " ").slice(0, 160)].filter(Boolean).join(" | ");
+    const step = payload.method || "?";
+    if (r.status === 401) throw new Error(`Mem0 recusou o login (401, ${step}): conecte de novo. ${why}`);
+    throw new Error(`MCP ${step}: HTTP ${r.status} ${why}`);
+  }
   return { sessionId: r.headers.get("Mcp-Session-Id") || sessionId,
     msg: payload.id === undefined ? null : parseMcpResponse(r.headers.get("Content-Type"), text, payload.id) };
 }
@@ -217,7 +243,7 @@ async function save(raw, { manual }) {
     await addLog({ status: "ok", site: ex.site, preview: ex.user.slice(0, 90) });
     return { status: "ok" };
   } catch (e) {
-    await addLog({ status: "error", site: ex.site, preview: String(e.message || e).slice(0, 160) });
+    await addLog({ status: "error", site: ex.site, preview: String(e.message || e).slice(0, 300) });
     return { status: "error", error: String(e.message || e) };
   }
 }
