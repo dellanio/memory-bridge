@@ -53,7 +53,11 @@ npm run publish:edge -- --yes --notes "texto para a certificação"
 
 O script empacota, envia o `.zip` para o rascunho (`POST /v1/products/$productID/submissions/draft/package`), acompanha a operação e publica (`POST /v1/products/$productID/submissions`). Sem `--yes` ele para no rascunho. A API **não** serve para criar produto novo nem para mexer em metadados (descrição, capturas) — isso continua sendo pela tela.
 
-> Histórico: 1.0.2 publicada em 07/10/2026 pela tela. 1.0.3 publicada em 11/11/2026 pela API (upload e publicação `succeeded`; status "In review").
+**Fila de submissão (importante).** A API só publica quando **não há nenhuma submissão em revisão**: se houver, a operação volta `Failed` com `errorCode: InProgressSubmission` ("Can't publish extension as your extension submission is in progress"). O script detecta isso, imprime a mensagem e sai com código 1 — o pacote **fica no rascunho**, e basta rodar `--yes` de novo depois. Para destravar na hora: Extension overview → **Cancel submission** na versão em revisão (leva 5–10 minutos) e só então publicar de novo.
+
+O **rascunho da listagem (descrição, tiles, capturas) viaja junto da submissão do pacote**: depois de publicar, o botão "Publish" da tela "Store listings" responde *"Can't publish extension as your extension has not been modified since last push"* — sinal de que o metadado novo já foi para a revisão. Ele não é publicado sozinho.
+
+> Histórico: 1.0.2 publicada em 07/10/2026 pela tela. 1.0.3 publicada em 11/11/2026 pela API (upload e publicação `succeeded`); revisão cancelada em 12/11/2026 para liberar a fila. 1.1.0 (Claude) publicada em 12/11/2026 pela API — upload e publicação `succeeded`, status "In review".
 
 ## Etapa 4 — Disponibilidade (Availability)
 
