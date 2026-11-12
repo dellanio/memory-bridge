@@ -150,14 +150,14 @@ O Claude renomeia os `data-testid` com frequência, então o adapter lê o texto
 - **Edge Add-ons**: 1.1.0 submitted and under review (store ID `0RDCKB8HRMN4`); the listing (en/pt), icon, screenshots and promo tiles are live.
 - **Chrome Web Store**: item `jabbichbmjfhbmvpjkpinflnjffkgpe` na conta `planoplusdev@gmail.com`, versão 1.1.1 **enviada para revisão** (Pending review), listagem en-US, contato público `contato@dellanio.com`. O pacote próprio é `npm run package:chrome` (`minimum_chrome_version: 106`).
 - Both stores share the same `src/`; only the manifest and the distribution channel differ. Route and pitfalls: `store/PARTNER-CENTER.md` (Edge) and `store/CHROME-STORE.md` (Chrome).
-- Still pending: the Claude adapter has not been validated with a signed-in account, and the Edge item should get 1.1.1 (the version with the data-policy consent) once the 1.1.0 review frees the submission queue.
+- Still pending: the Claude adapter has not been validated with a signed-in account, and the Edge item is scheduled to get 1.1.1 (the version with the data-policy consent) as soon as the 1.1.0 review frees the submission queue.
 
 ## Publicação (Edge Add-ons e Chrome Web Store)
 
 - **Edge Add-ons**: 1.1.0 enviada e em revisão (store ID `0RDCKB8HRMN4`); a listagem (en/pt), o ícone, as capturas e os tiles já estão no ar.
 - **Chrome Web Store**: item `jabbichbmjfhbmvpjkpinflnjffkgpe` na conta `planoplusdev@gmail.com`, versão 1.1.1 **enviada para revisão** (Pending review), listagem en-US, contato público `contato@dellanio.com`. O pacote próprio é `npm run package:chrome` (`minimum_chrome_version: 106`).
 - As duas lojas usam o mesmo `src/`; só mudam o manifesto e o canal de distribuição. Roteiro e armadilhas: `store/PARTNER-CENTER.md` (Edge) e `store/CHROME-STORE.md` (Chrome).
-- Pendente: o adaptador do Claude ainda não foi validado com conta logada, e o item do Edge deve receber a 1.1.1 (a versão com o consentimento de política de dados) assim que a revisão da 1.1.0 liberar a fila de submissão.
+- Pendente: o adaptador do Claude ainda não foi validado com conta logada, e o item do Edge tem a **1.1.1 agendada** (a versão com o consentimento de política de dados) para assim que a revisão da 1.1.0 liberar a fila de submissão.
 
 ## License
 

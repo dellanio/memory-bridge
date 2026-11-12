@@ -45,6 +45,7 @@ Como funciona
 • Interface em português (Brasil) e inglês (EUA).
 
 Sua conta, seus dados
+• A tela de Configurações abre com a política de dados em linguagem simples: nada sai do seu navegador até você marcar a caixa de aceite e salvar, e desmarcar faz a extensão parar de enviar.
 • Entre com a sua conta Mem0 (OAuth oficial do Mem0) ou use uma chave de API — direto na API REST ou no próprio servidor MCP do Mem0.
 • Você escolhe o User ID com que as memórias são gravadas e o app_id de cada site.
 • Chaves de API, tokens e números de cartão que aparecerem na conversa são ocultados antes do envio.
@@ -77,10 +78,11 @@ How it works
 • Interface in English (US) and Portuguese (Brazil).
 
 Your account, your data
+• The Settings screen opens with a plain-language data policy: nothing leaves your browser until you tick the consent box and save, and unticking it stops the extension from sending anything.
 • Sign in with your Mem0 account (official Mem0 OAuth) or use an API key — straight to the REST API or to Mem0's own MCP server.
 • You choose the User ID memories are saved under and the app_id for each site.
 • API keys, tokens and card numbers that show up in a chat are hidden before sending.
-• Everything goes straight from your browser to Mem0. No middle server, no tracking, no ads.
+• Everything goes straight from your browser to Mem0. No middle server, no tracking, no ads. The developer never receives your data.
 
 Requires a Mem0 account (https://mem0.ai). Independent project, not officially affiliated with Mem0, OpenAI, Google or Anthropic.
 
@@ -94,17 +96,17 @@ mem0, memory, chatgpt, gemini, claude, ai, context
 
 The extension needs a free Mem0 account (https://app.mem0.ai) to be tested.
 
-1. After installing, the options page opens. Click "Connect" and sign in to Mem0 (OAuth via chrome.identity.launchWebAuthFlow against https://mcp.mem0.ai). Alternatively choose an API key mode ("API key on the MCP server" or "API key") and paste a Mem0 API key.
+1. After installing, the options page opens. It starts with a data-policy disclosure: tick "I have read and agree: the last question and answer may be sent to my Mem0 account, and nothing is sent to the developer" and click "Save". Without that consent the extension refuses to send anything. Then click "Connect" and sign in to Mem0 (OAuth via chrome.identity.launchWebAuthFlow against https://mcp.mem0.ai). Alternatively choose an API key mode ("API key on the MCP server" or "API key") and paste a Mem0 API key.
 2. Fill "User ID" (any text, e.g. "tester") and click "Save".
 3. Open https://chatgpt.com (works without login) and send: "My favorite food is pizza. Reply only: ok".
 4. In automatic mode the "Save to Mem0" button turns green ("Saved ✓") a few seconds after the answer; the toolbar popup lists the memory created ("User's favorite food is pizza"). A question with nothing personal (e.g. "What is 12 x 12?") only makes the button blink grey.
 5. The same button is injected on https://gemini.google.com and https://claude.ai (both work without login; on Claude the conversation list is virtualized, so the extension reads the last mounted exchange).
 
 Permissions:
-- storage: settings, sign-in token and recent activity, kept only in chrome.storage.local.
+- storage: settings, consent flag, sign-in token and recent activity, kept only in chrome.storage.local.
 - identity: OAuth sign-in to Mem0 (launchWebAuthFlow).
 - declarativeNetRequestWithHostAccess: one session rule that removes the Origin header only from the extension's own requests to mcp.mem0.ai (the Mem0 MCP server rejects requests that carry an Origin header with HTTP 403).
 - Host permissions https://mcp.mem0.ai/* and https://api.mem0.ai/*: the only servers the extension talks to.
-- Content scripts on chatgpt.com, chat.openai.com, gemini.google.com and claude.ai: read the last question/answer of the open conversation and show the save button. No data is sent anywhere except to the Mem0 account chosen by the user.
+- Content scripts on chatgpt.com, chat.openai.com, gemini.google.com and claude.ai: read the last question/answer of the open conversation and show the save button. No data is sent anywhere except to the Mem0 account chosen by the user, and only after the user consents in the extension's own settings.
 
 No remote code is loaded; all code is in the package.
