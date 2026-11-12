@@ -4,6 +4,9 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 (https://chrome.google.com/webstore/devconsole).
 
 - Conta de desenvolvedor: **planoplusdev@gmail.com**
+- E-mail de contato (público no item): **contato@dellanio.com** — precisa estar verificado
+  para o item poder ser publicado (o painel pede isso em Settings → Profile → "Verify email
+  address"; o link chega por e-mail e expira em 1 hora).
 - Pacote: `npm run package:chrome` → `dist/memory-bridge-1.1.1-chrome.zip`
 - Item criado no painel: **Memory Bridge for Mem0**, ID `jabbichbmjfhbmvpjkpinflnjffkgpe`
   (criado no primeiro upload; a 1.1.0 foi o rascunho inicial e a 1.1.1 é a versão com o
@@ -22,6 +25,43 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 | `chrome.storage.session` | `src/background.js` (diagnóstico por site) | 102 |
 | `chrome.identity.launchWebAuthFlow` | `src/background.js` (OAuth do Mem0) | 106 |
 | service worker `type: "module"` | `manifest.json` | 91 |
+
+## Estado (12/11/2026)
+
+- Item criado: **Memory Bridge for Mem0** — ID `jabbichbmjfhbmvpjkpinflnjffkgpe` (rascunho).
+- Pacote no item: **1.1.1** (17 arquivos, `minimum_chrome_version: 106`).
+- Listagem en-US: título e summary vêm do pacote; descrição (1.607 caracteres), categoria
+  **Workflow & Planning**, ícone 128×128 (sem alfa), 2 capturas 1280×800 (localizadas e
+  globais), tiles 440×280 e 1400×560, homepage `dellanio.com`, suporte
+  `dellanio.github.io/memory-bridge/`.
+- Privacidade: single purpose + 4 justificativas (storage, identity, DNR, host permissions),
+  URL da política de privacidade, tipos de dados marcados (**Website content**, **Personal
+  communications**, **Authentication information**) e as 3 certificações marcadas.
+- Distribuição: gratuito, **público**, todas as regiões.
+- Instruções de teste: usuário/senha de uma conta de teste do Mem0 + 439 caracteres de passo
+  a passo (inclui marcar o consentimento na tela de opções).
+- **Bloqueio restante:** o e-mail de contato `contato@dellanio.com` ainda não foi verificado.
+  Depois de verificado, o botão "Submit for review" fica habilitado (o painel lista isso em
+  "Why can't I submit?").
+
+## O que o painel já ensinou (armadilhas)
+
+- **O item nasce no primeiro upload**: "Add new item" abre um seletor de arquivo e o upload do
+  `.zip` já cria o item e atribui o extension ID. Só depois dá para editar a listagem.
+- **Trocar versão**: "Upload new package" na aba Package; o painel vai para a Store listing
+  e passa a mostrar "Title/Summary from package" da nova versão.
+- **Trocar imagem**: o ícone de lixeira só aparece no hover da miniatura, e a remoção pede
+  confirmação ("Remove"). Depois é preciso subir de novo — não há "substituir".
+- **O `upload_files` do runtime às vezes devolve erro e mesmo assim envia** (Electron): o
+  arquivo chega; confirme pela miniatura antes de tentar de novo (reenviar duplica a imagem).
+- **Não existe URL direta para as abas do item**: os links do menu são relativos
+  (`./webstore/devconsole/<publisher>/<item>/edit/privacy`) e só funcionam por clique; abrir a
+  URL completa na mão devolve 404 ou cai no painel.
+- **"Why can't I submit?"** lista exatamente o que falta — é o atalho para diagnosticar.
+- **O Official URL** só aceita domínios registrados no Search Console dessa conta; sem isso
+  o campo rejeita com "This URL is not verified in Google Search Console".
+- **A Publish API do Chrome Web Store** (v1.1) só atualiza itens já existentes e exige OAuth
+  do Google Cloud + refresh token; a primeira publicação é pelo painel.
 
 ## Propriedades
 
