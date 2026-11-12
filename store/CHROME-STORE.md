@@ -28,7 +28,11 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 
 ## Estado (12/11/2026)
 
-- Item criado: **Memory Bridge for Mem0** — ID `jabbichbmjfhbmvpjkpinflnjffkgpe` (rascunho).
+- **Enviado para revisão**: o item está como **Pending review** no painel (1/2 do limite de
+  extensões usado). A opção de publicação automática após a aprovação ficou marcada (padrão
+  do Google): assim que passarem, a extensão vai ao ar sozinha, pública, na listagem en-US.
+- Item: **Memory Bridge for Mem0** — ID `jabbichbmjfhbmvpjkpinflnjffkgpe`.
+- Contato público: `contato@dellanio.com` (verificado — o link foi confirmado em 12/11/2026).
 - Pacote no item: **1.1.1** (17 arquivos, `minimum_chrome_version: 106`).
 - Listagem en-US: título e summary vêm do pacote; descrição (1.607 caracteres), categoria
   **Workflow & Planning**, ícone 128×128 (sem alfa), 2 capturas 1280×800 (localizadas e
@@ -40,9 +44,8 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 - Distribuição: gratuito, **público**, todas as regiões.
 - Instruções de teste: usuário/senha de uma conta de teste do Mem0 + 439 caracteres de passo
   a passo (inclui marcar o consentimento na tela de opções).
-- **Bloqueio restante:** o e-mail de contato `contato@dellanio.com` ainda não foi verificado.
-  Depois de verificado, o botão "Submit for review" fica habilitado (o painel lista isso em
-  "Why can't I submit?").
+- **Bloqueio restante:** nenhum — o e-mail de contato foi verificado e o item foi enviado
+  para revisão. Depois da aprovação o Google publica sozinho (opção marcada no diálogo).
 
 ## O que o painel já ensinou (armadilhas)
 
