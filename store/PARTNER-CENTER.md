@@ -157,6 +157,16 @@ Clique **Edit details** em cada linha (English e Português).
 Não use o botão "Generate with AI": a descrição pronta já foi revisada.
 **Save draft** em cada idioma. A coluna Status deve ficar **Complete** nas duas linhas.
 
+### Como essa tela se comporta (armadilhas)
+
+- **Imagem só existe depois de "Save draft".** Excluir ou enviar um tile/captura muda só o modelo do cliente; a gravação é o `PUT .../listings/Assets/bulk` que sai no "Save draft" (o upload em si é `POST .../listings/Assets` + `.../commit`, que acontecem na hora).
+- **Um refresh do modelo apaga o que não foi salvo.** O app busca `GET .../listings/storeListings` de tempos em tempos (também quando a aba volta ao foco). Se isso rolar entre a troca de imagem e o "Save draft", a exclusão/upload é perdida e o servidor devolve a versão antiga. Faça as trocas de imagem e salve em sequência, sem pausas.
+- **Captura tem tamanho fixo: exatamente 1280 × 800 ou 640 × 400.** Qualquer outro tamanho é recusado com "File size is incorrect for `<arquivo>`. Please try uploading a valid .png file that is exactly 1280 x 800 pixels or 640 x 400 pixels." — por isso `tools/store-assets.mjs` gera tudo em 1280 × 800.
+- **O "Edit" da captura edita o título (legenda), não a imagem.** Para trocar a imagem: excluir a antiga (há confirmação) e enviar a nova pelo "Add Image".
+- **O bloco promocional só tem "Magnify"/"Delete".** O "Add Image" (com o tamanho exigido) só aparece no slot vazio, depois de excluir o antigo.
+- **"Publish" fica bloqueado enquanto houver submissão em revisão**: "Your extension is in-review. Update cannot be published right now, please try again later." As alterações ficam salvas (as duas linhas seguem **Complete**) e vão ao ar quando a revisão terminar — ou junto da próxima submissão.
+- **Termos de busca**: o campo só registra o texto digitado (o Angular não pega valor colado); digite e clique em "Add Term". No máximo 7 termos e 21 palavras ao todo.
+
 ## Etapa 8 — Notas para certificação e envio
 
 **Publish** (canto superior direito) → cole em **Notes for certification**:
