@@ -31,6 +31,7 @@ const DEFAULTS = {
   redactSecrets: true,
   instructions: null,         // null = instrução padrão no idioma escolhido
   language: "auto",           // "auto" (idioma do navegador) | "pt_BR" | "en"
+  consent: false,             // aceite do usuário (política de dados da loja); sem aceite nada é enviado
 };
 
 // ---------- idioma ----------
@@ -372,6 +373,8 @@ async function addViaRest(ex, settings) {
 async function save(raw, { manual }) {
   const settings = await getSettings();
   if (!settings.enabled) return { status: "skipped", reason: "pausado" };
+  // política de dados da loja: sem aceite explícito do usuário, nada sai do navegador
+  if (!settings.consent) return { status: "consent", error: await T("consentNeed") };
   if (!settings.sites[raw.site]) return { status: "skipped", reason: "site desativado" };
   if (!manual && settings.mode !== "auto") return { status: "skipped", reason: "modo manual" };
   if (!settings.userId.trim()) {
@@ -432,9 +435,16 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
       case "getState": return { settings: await getSettings(), auth: !!(await getAuth())?.accessToken,
         log: (await chrome.storage.local.get("log")).log || [] };
       case "setSettings": await setSettings(msg.patch); return { ok: true };
-      case "login": return login({ force: !!msg.force }).then(() => ({ ok: true }));
+      case "login": {
+        // a conexão OAuth e o teste de chave tocam dados do usuário: exigem aceite
+        if (!(await getSettings()).consent) return { ok: false, error: await T("consentRequired") };
+        return login({ force: !!msg.force }).then(() => ({ ok: true }));
+      }
       case "logout": await logout(); return { ok: true };
-      case "test": return { ok: true, message: await testConnection() };
+      case "test": {
+        if (!(await getSettings()).consent) return { ok: false, error: await T("consentRequired") };
+        return { ok: true, message: await testConnection() };
+      }
       case "clearLog": await chrome.storage.local.set({ log: [] }); chrome.action.setBadgeText({ text: "" }); return { ok: true };
       default: return { error: "mensagem desconhecida" };
     }

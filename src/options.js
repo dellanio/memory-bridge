@@ -17,6 +17,8 @@ async function load() {
   for (const k of SITES) { $(`site_${k}`).checked = !!s.sites[k]; $(`app_${k}`).value = s.appIds[k] || k; }
   $("redact").checked = !!s.redactSecrets;
   $("instructions").value = s.instructions || "";
+  $("consent").checked = !!s.consent;
+  consentNote();
   // nos modos com chave de API o estado é a própria chave, não o OAuth
   const connected = s.authMode === "oauth" ? !!auth : !!(s.apiKey || "").trim();
   $("authState").textContent = connected ? t("connected") : t("notConnected");
@@ -41,7 +43,21 @@ function collect() {
     appIds: Object.fromEntries(SITES.map((k) => [k, $(`app_${k}`).value.trim() || k])),
     redactSecrets: $("redact").checked,
     instructions: $("instructions").value.trim(),
+    consent: $("consent").checked,
   };
+}
+
+// o aceite é a condição para qualquer coisa que toque dados do usuário (conectar, testar, enviar)
+function consentNote() {
+  const on = $("consent").checked;
+  $("consentOut").textContent = on ? "" : t("consentOff");
+  $("consentOut").className = "note" + (on ? "" : " err");
+}
+function requireConsent(el) {
+  if ($("consent").checked) return true;
+  show(el, { ok: false, error: t("consentRequired") });
+  $("consentCard").scrollIntoView({ behavior: "smooth", block: "center" });
+  return false;
 }
 
 function show(el, r, okText) {
@@ -50,13 +66,17 @@ function show(el, r, okText) {
 }
 
 document.querySelectorAll("input[name=auth]").forEach((e) => e.addEventListener("change", toggle));
+$("consent").addEventListener("change", consentNote);
 $("save").onclick = async () => {
+  // salvar é sempre permitido: é assim que o usuário revoga o aceite (desmarca e salva)
   show($("saveOut"), await msg({ type: "setSettings", patch: collect() }), t("saved"));
+  consentNote();
   setTimeout(() => { $("saveOut").textContent = ""; }, 2500);
 };
 $("connect").onclick = async () => {
   const b = $("connect");
   if (b.disabled) return;
+  if (!requireConsent($("testOut"))) return;
   b.disabled = true;                       // evita vários cliques enquanto a janela do Mem0 abre
   $("authState").textContent = t("optWaiting");
   $("authState").className = "pill wait";
@@ -79,6 +99,7 @@ $("language").onchange = async () => {
 $("restoreInstr").onclick = async () => { $("instructions").value = (await msg({ type: "defaultInstructions" })).text; };
 $("disconnect").onclick = async () => { await msg({ type: "logout" }); load(); };
 $("test").onclick = async () => {
+  if (!requireConsent($("testOut"))) return;
   await msg({ type: "setSettings", patch: collect() });
   $("testOut").textContent = "…"; show($("testOut"), await msg({ type: "test" }));
 };

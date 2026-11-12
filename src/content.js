@@ -250,6 +250,7 @@
       flash("ok", t("btnSaved", "Salvo ✓"));
       btn.title = (r.memories || []).join("\n");
     } else if (r.status === "nothing") blinkNothing();
+    else if (r.status === "consent") { blinkNothing(); btn.title = t("consentNeed"); }
     else if (r.status === "duplicate") { if (manual) flash("ok", t("btnAlready", "Já salvo ✓")); }
     else if (r.status === "pending") { if (manual) flash("busy", t("btnPending", "Enviado — o Mem0 ainda está processando"), 3000); }
     else if (r.status === "skipped") { btn.className = ""; lbl.textContent = LABEL; }

@@ -17,6 +17,7 @@ Browser extension for **Edge e Chrome** (Manifest V3) que salva o que importa da
 - Sends the last exchange (your question + the answer) with a configurable `user_id`, a per-site `app_id` (default `chatgpt` / `gemini` / `claude`) and metadata (`site`, `conversation_id`, `url`). Mem0 extracts the facts; the whole conversation is not stored.
 - Hides obvious secrets before sending (API keys, tokens, JWTs, private keys, card numbers). Can be turned off.
 - Interface in **Portuguese (Brazil)** and **English (US)**: follows the browser language or whatever you pick at the top of the Settings screen.
+- **Data-policy consent on first use:** the Settings screen opens with a plain-language disclosure of what is read and sent; nothing leaves the browser until you tick it and save, and unticking it revokes the consent.
 - Never sends the same exchange twice. History of the last 30 actions in the toolbar icon, with a red "!" when something fails.
 
 ## O que faz
@@ -26,6 +27,7 @@ Browser extension for **Edge e Chrome** (Manifest V3) que salva o que importa da
 - Envia a última troca (sua pergunta + a resposta) com `user_id` configurável, `app_id` por site (padrão `chatgpt` / `gemini` / `claude`) e metadados (`site`, `conversation_id`, `url`). O Mem0 extrai os fatos; a conversa inteira não é guardada.
 - Oculta segredos óbvios antes de enviar (chaves de API, tokens, JWT, chaves privadas, números de cartão). Pode desligar.
 - Interface em **Português (Brasil)** e **English (US)**: segue o idioma do navegador ou o que você escolher no topo da tela de Configurações.
+- **Consentimento de política de dados na primeira uso:** a tela de Configurações abre com a divulgação, em linguagem simples, do que é lido e enviado; nada sai do navegador até você marcar a caixa e salvar, e desmarcar revoga o aceite.
 - Não envia a mesma troca duas vezes. Histórico das últimas 30 ações no ícone, com "!" vermelho quando algo falha.
 
 ---
@@ -80,13 +82,13 @@ Se o login parar do nada, o conserto é: **Configurações → Conectar** (o cli
 
 1. `edge://extensions` (or `chrome://extensions`) → turn on **Developer mode**.
 2. **Load unpacked** → select this folder.
-3. In the options screen that opens: pick the authentication (OAuth, or API key on MCP/REST), click **Connect** (OAuth only) and fill in the **User ID**. **Test connection** confirms.
+3. In the options screen that opens: read the data-policy disclosure at the top, tick **"I have read and agree"** and **Save**, then pick the authentication (OAuth, or API key on MCP/REST), click **Connect** (OAuth only) and fill in the **User ID**. **Test connection** confirms.
 
 ## Instalar (modo desenvolvedor)
 
 1. `edge://extensions` (ou `chrome://extensions`) → ligue **Modo de desenvolvedor**.
 2. **Carregar sem compactação** → selecione esta pasta.
-3. Na tela de opções que abre: escolha a autenticação (OAuth, ou chave de API no MCP/REST), clique **Conectar** (só no OAuth) e preencha o **User ID**. **Testar conexão** confirma.
+3. Na tela de opções que abre: leia a divulgação de política de dados no topo, marque **"Li e concordo"** e **Salve**; depois escolha a autenticação (OAuth, ou chave de API no MCP/REST), clique **Conectar** (só no OAuth) e preencha o **User ID**. **Testar conexão** confirma.
 
 ---
 
@@ -145,11 +147,17 @@ O Claude renomeia os `data-testid` com frequência, então o adapter lê o texto
 
 ## Publication (Edge Add-ons and Chrome Web Store)
 
-Pending before publishing: final icons and screenshots, hosted privacy policy (based on `PRIVACY.md`), testing the OAuth flow with the final store ID (the dynamic registration redoes itself when the `redirect_uri` changes), and validating the Claude adapter with a signed-in account.
+- **Edge Add-ons**: 1.1.0 submitted and under review (store ID `0RDCKB8HRMN4`); the listing (en/pt), icon, screenshots and promo tiles are live.
+- **Chrome Web Store**: new item `jabbichbmjfhbmvpjkpinflnjffkgpe` on the account `planoplusdev@gmail.com`; listing in en-US, assets uploaded, privacy declared. The package built for it is `npm run package:chrome` (`minimum_chrome_version: 106`).
+- Both stores share the same `src/`; only the manifest and the distribution channel differ. Route and pitfalls: `store/PARTNER-CENTER.md` (Edge) and `store/CHROME-STORE.md` (Chrome).
+- Still pending: the Claude adapter has not been validated with a signed-in account, and the Edge item should get 1.1.1 (the version with the data-policy consent) once the 1.1.0 review frees the submission queue.
 
 ## Publicação (Edge Add-ons e Chrome Web Store)
 
-Pendências antes de publicar: ícones definitivos e capturas de tela, política de privacidade hospedada (base em `PRIVACY.md`), testar o fluxo OAuth com o ID definitivo da loja (o registro dinâmico se refaz sozinho quando o `redirect_uri` muda) e validar o adaptador do Claude com conta logada.
+- **Edge Add-ons**: 1.1.0 enviada e em revisão (store ID `0RDCKB8HRMN4`); a listagem (en/pt), o ícone, as capturas e os tiles já estão no ar.
+- **Chrome Web Store**: item novo `jabbichbmjfhbmvpjkpinflnjffkgpe` na conta `planoplusdev@gmail.com`; listagem em en-US, assets enviados e privacidade declarada. O pacote próprio é `npm run package:chrome` (`minimum_chrome_version: 106`).
+- As duas lojas usam o mesmo `src/`; só mudam o manifesto e o canal de distribuição. Roteiro e armadilhas: `store/PARTNER-CENTER.md` (Edge) e `store/CHROME-STORE.md` (Chrome).
+- Pendente: o adaptador do Claude ainda não foi validado com conta logada, e o item do Edge deve receber a 1.1.1 (a versão com o consentimento de política de dados) assim que a revisão da 1.1.0 liberar a fila de submissão.
 
 ## License
 

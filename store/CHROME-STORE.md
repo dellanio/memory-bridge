@@ -4,7 +4,10 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 (https://chrome.google.com/webstore/devconsole).
 
 - Conta de desenvolvedor: **planoplusdev@gmail.com**
-- Pacote: `npm run package:chrome` → `dist/memory-bridge-1.1.0-chrome.zip`
+- Pacote: `npm run package:chrome` → `dist/memory-bridge-1.1.1-chrome.zip`
+- Item criado no painel: **Memory Bridge for Mem0**, ID `jabbichbmjfhbmvpjkpinflnjffkgpe`
+  (criado no primeiro upload; a 1.1.0 foi o rascunho inicial e a 1.1.1 é a versão com o
+  consentimento de política de dados, que o Chrome exige).
 - Código: **o mesmo** da loja do Edge (`src/`, `icons/`, `_locales/`). A única diferença
   de manifesto é `minimum_chrome_version: "106"` (ver `scripts/package.mjs --chrome`).
 - O item no Chrome é **novo**: extension ID, listagem e fila de revisão próprios.
@@ -24,8 +27,8 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 
 | Campo | Valor |
 |---|---|
-| Idioma da listagem | en-US (ou pt-BR — ver "Listagem" abaixo) |
-| Categoria | Produtividade (Productivity) |
+| Idioma da listagem | en-US (uma listagem por item) |
+| Categoria | Workflow & Planning (Productivity) |
 | Site (homepage) | https://dellanio.com |
 | URL de suporte | https://dellanio.github.io/memory-bridge/ |
 | Política de privacidade (URL) | https://dellanio.github.io/memory-bridge/privacy.html |
@@ -33,17 +36,22 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 | Público-alvo | 13+ / todos os públicos |
 | Visibilidade | Pública |
 
+O campo **Official URL** fica vazio de propósito: ele só aceita domínios registrados no
+Search Console dessa conta, e o `dellanio.com` ainda não está registrado lá (o painel
+mostra "This URL is not verified in Google Search Console"). Para usar, registre o domínio
+no Search Console e associe à conta do Chrome Web Store.
+
 ## Imagens (reaproveitadas da loja do Edge — os tamanhos servem nos dois canais)
 
 | Campo | Arquivo |
 |---|---|
-| Ícone (128×128) | `icons/icon128.png` |
+| Ícone (128×128) | `store/icon-128-rgb.png` (**sem canal alfa** — o Chrome recusa PNG com alfa; o `icons/icon128.png` da extensão tem alfa e não serve para a loja) |
 | Capturas de tela (1280×800) | `store/screenshot-1-options-en.png`, `store/screenshot-2-popup-en.png` (ou `-pt`) |
 | Bloco promocional pequeno (440×280) | `store/promo-440x280-en.png` (ou `-pt`) |
 | Bloco promocional grande (1400×560) | `store/promo-1400x560-en.png` (ou `-pt`) |
 
 O Chrome aceita captura de 1280×800 ou 640×400, até 5 por listagem. Os arquivos acima já
-estão em 1280×800.
+estão em 1280×800, em RGB (24-bit, sem alfa).
 
 ## Listagem
 
@@ -118,38 +126,57 @@ Saves the user's own AI chat exchanges (ChatGPT, Gemini and Claude) to the user'
 
 ## Privacidade / data usage
 
-O Chrome pede a declaração de uso de dados. O que vale declarar:
+O Chrome pede a declaração de uso de dados. A declaração usada é:
 
-- A extensão **não coleta** dados para uso próprio, **não vende** e **não usa** dados para
-  finalidades sem relação com o item (sem anúncios, sem analytics, sem servidor do desenvolvedor).
-- O conteúdo da conversa vai do navegador do usuário **direto para a conta Mem0 do próprio
-  usuário**, porque foi o usuário quem pediu (botão "Salvar no Mem0" ou modo automático que ele
-  ligou). Não há intermediário, não há compartilhamento com terceiros além do Mem0 escolhido
-  pelo usuário, e há um botão "Desconectar" que revoga o token.
-- Política de privacidade pública: https://dellanio.github.io/memory-bridge/privacy.html
+**Tipos de dados tratados (marcar):**
 
-Se o formulário oferecer as opções "Dados coletados" / "Dados compartilhados", a resposta
-honesta é: os dados do usuário (conteúdo da conversa) **não são coletados** pelo desenvolvedor
-e **não são compartilhados** com terceiros — o envio é para o serviço (Mem0) que o próprio
-usuário escolheu e configurou.
+| Caixa | Item |
+|---|---|
+| ✅ | **Website content** — o texto da última pergunta e da última resposta |
+| ✅ | **Personal communications** — as mensagens de chat |
+| ✅ | **Authentication information** — o token/chave de API do Mem0 que o usuário autoriza |
+| ⬜ | as demais (PII, Health, Financial, Location, Web history, User activity) |
+
+**As três certificações (marcar todas):** não vende nem transfere dados para terceiros fora
+do uso aprovado; não usa nem transfere dados para finalidades sem relação com o único
+propósito; não usa nem transfere dados para avaliar a capacidade de crédito.
+
+**Por que isso é honesto.** A extensão lê o conteúdo da página e o envia para fora do
+navegador — para a conta Mem0 **do próprio usuário**, com as **credenciais do próprio
+usuário**, a pedido do usuário. O desenvolvedor não recebe nada: não há servidor dele,
+nem analytics, nem anúncios. O destino (mcp.mem0.ai / api.mem0.ai) é o serviço que o
+usuário escolheu e mantém.
+
+**Por que existe o consentimento (versão 1.1.1).** A Chrome Web Store exige que o produto
+que trata dados do usuário mostre a divulgação de forma destacada **na própria interface**
+e obtenha o consentimento afirmativo do usuário antes disso. Por isso a primeira seção da
+página de opções é a divulgação ("Before you start: what this extension does with your
+data") com uma caixa de aceite:
+
+- sem o aceite, o service worker **recusa** qualquer envio (status `consent`);
+- "Connect" e "Test connection" ficam bloqueados com a mensagem de política;
+- desmarcar e salvar **revoga** o consentimento — nada mais é enviado;
+- a política de privacidade publicada tem a declaração de **Limited Use** exigida pelo
+  Chrome, e está a um clique da extensão (link "Full privacy policy" na página de opções).
 
 ## Notas para a certificação (o revisor precisa de um caminho de teste)
 
 ```
 The extension needs a free Mem0 account (https://app.mem0.ai) to be tested.
 
-1. After installing, the options page opens. Click "Connect" and sign in to Mem0 (OAuth via chrome.identity.launchWebAuthFlow against https://mcp.mem0.ai). Alternatively choose an API key mode ("API key on the MCP server" or "API key") and paste a Mem0 API key.
-2. Fill "User ID" (any text, e.g. "tester") and click "Save".
-3. Open https://chatgpt.com (works without login) and send: "My favorite food is pizza. Reply only: ok".
-4. In automatic mode the "Save to Mem0" button turns green ("Saved ✓") a few seconds after the answer; the toolbar popup lists the memory created ("User's favorite food is pizza"). A question with nothing personal (e.g. "What is 12 x 12?") only makes the button blink grey.
-5. The same button is injected on https://gemini.google.com and https://claude.ai (both work without login; on Claude the conversation list is virtualized, so the extension reads the last mounted exchange).
+1. After installing, the options page opens. It starts with a data-policy disclosure: tick "I have read and agree: the last question and answer may be sent to my Mem0 account, and nothing is sent to the developer" and click "Save". Without that consent the extension refuses to send anything.
+2. Click "Connect" and sign in to Mem0 (OAuth via chrome.identity.launchWebAuthFlow against https://mcp.mem0.ai). Alternatively choose an API key mode ("API key on the MCP server" or "API key") and paste a Mem0 API key.
+3. Fill "User ID" (any text, e.g. "tester") and click "Save".
+4. Open https://chatgpt.com (works without login) and send: "My favorite food is pizza. Reply only: ok".
+5. In automatic mode the "Save to Mem0" button turns green ("Saved ✓") a few seconds after the answer; the toolbar popup lists the memory created ("User's favorite food is pizza"). A question with nothing personal (e.g. "What is 12 x 12?") only makes the button blink grey.
+6. The same button is injected on https://gemini.google.com and https://claude.ai (both work without login; on Claude the conversation list is virtualized, so the extension reads the last mounted exchange).
 
 Permissions:
-- storage: settings, sign-in token and recent activity, kept only in chrome.storage.local.
+- storage: settings, consent flag, sign-in token and recent activity, kept only in chrome.storage.local.
 - identity: OAuth sign-in to Mem0 (launchWebAuthFlow).
 - declarativeNetRequestWithHostAccess: one session rule that removes the Origin header only from the extension's own requests to mcp.mem0.ai (the Mem0 MCP server rejects requests that carry an Origin header with HTTP 403).
 - Host permissions https://mcp.mem0.ai/* and https://api.mem0.ai/*: the only servers the extension talks to.
-- Content scripts on chatgpt.com, chat.openai.com, gemini.google.com and claude.ai: read the last question/answer of the open conversation and show the save button. No data is sent anywhere except to the Mem0 account chosen by the user.
+- Content scripts on chatgpt.com, chat.openai.com, gemini.google.com and claude.ai: read the last question/answer of the open conversation and show the save button. No data is sent anywhere except to the Mem0 account chosen by the user, and only after the user consents in the extension's own UI.
 
 No remote code is loaded; all code is in the package.
 ```

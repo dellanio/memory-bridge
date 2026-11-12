@@ -52,6 +52,11 @@ input[type=radio],input[type=checkbox]{accent-color:var(--brand);width:16px;heig
 .btn.primary:hover{filter:brightness(1.07)}
 .btn.ghost{background:transparent}
 
+/* consentimento (política de dados) */
+.consent-card{border-color:var(--brand);box-shadow:0 0 0 1px var(--brand) inset,var(--shadow)}
+.consent-list{margin:0 0 12px;padding-left:20px;color:var(--muted);font-size:13px}
+.consent-list li{margin:4px 0}
+
 /* status */
 .pill{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--line);color:var(--muted);white-space:nowrap}
 .pill.ok{background:var(--ok-bg);color:var(--ok)} .pill.wait{background:var(--wait-bg);color:var(--brand)}

@@ -202,5 +202,35 @@
   },
   "userIdPlaceholder": {
     "message": "ex.: maria"
+  },
+  "consentHeading": {
+    "message": "Antes de começar: o que esta extensão faz com os seus dados"
+  },
+  "consentDesc": {
+    "message": "Esta extensão lê a última pergunta e a última resposta da conversa que está aberta no chatgpt.com, no gemini.google.com e no claude.ai, e envia o que você escolher para a SUA conta Mem0."
+  },
+  "consentItem1": {
+    "message": "O desenvolvedor não recebe nenhum dado seu: tudo vai direto do seu navegador para a sua conta Mem0."
+  },
+  "consentItem2": {
+    "message": "A chave de API ou o token de acesso que você autorizar ficam guardados só no seu navegador (chrome.storage.local)."
+  },
+  "consentItem3": {
+    "message": "Nenhum dado é usado para publicidade, análise ou compartilhamento com terceiros, além do Mem0 que você escolheu."
+  },
+  "consentAccept": {
+    "message": "Li e concordo: a última pergunta e resposta podem ser enviadas para a minha conta Mem0, e nada é enviado ao desenvolvedor."
+  },
+  "consentRequired": {
+    "message": "É preciso aceitar acima antes de conectar e de salvar conversas."
+  },
+  "consentNeed": {
+    "message": "Aceite a política de dados nas configurações para enviar ao Mem0."
+  },
+  "consentOff": {
+    "message": "Sem aceite, nada é enviado ao Mem0."
+  },
+  "consentPolicy": {
+    "message": "Política de privacidade completa"
   }
 }

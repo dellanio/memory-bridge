@@ -16,6 +16,22 @@
 </header>
 
 <main class="wrap">
+  <section class="card consent-card" id="consentCard">
+    <div class="card-head"><h2 data-i18n="consentHeading"></h2></div>
+    <p class="desc" data-i18n="consentDesc"></p>
+    <ul class="consent-list">
+      <li data-i18n="consentItem1"></li>
+      <li data-i18n="consentItem2"></li>
+      <li data-i18n="consentItem3"></li>
+    </ul>
+    <p class="desc"><a id="consentPolicy" href="https://dellanio.github.io/memory-bridge/privacy.html" target="_blank" rel="noopener" data-i18n="consentPolicy"></a></p>
+    <label class="choice">
+      <input type="checkbox" id="consent">
+      <span class="choice-body"><strong data-i18n="consentAccept"></strong></span>
+    </label>
+    <p class="note" id="consentOut"></p>
+  </section>
+
   <section class="card">
     <div class="card-head"><h2 data-i18n="secAccount"></h2><span id="authState" class="pill"></span></div>
     <p class="desc" data-i18n="secAccountDesc"></p>
