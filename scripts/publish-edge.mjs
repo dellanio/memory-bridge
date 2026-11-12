@@ -56,7 +56,15 @@ async function poll(url, label) {
     let j = {}; try { j = JSON.parse(body); } catch { /* corpo livre */ }
     const st = String(j.status || j.state || "").toLowerCase();
     console.log(`  ${label}: ${st || body.slice(0, 120)}`);
-    if (st && !["inprogress", "in progress", "pending", "processing"].includes(st)) return j;
+    if (st && !["inprogress", "in progress", "pending", "processing"].includes(st)) {
+      if (["failed", "error", "canceled", "cancelled"].includes(st)) {
+        const dica = j.errorCode === "InProgressSubmission"
+          ? " Ja existe uma submissao em revisao: o pacote so entra em revisao depois que ela terminar."
+          : "";
+        throw new Error(`${label} falhou (${j.errorCode || st}): ${j.message || body.slice(0, 300)}${dica}`);
+      }
+      return j;
+    }
     await sleep(4000);
   }
   throw new Error(`${label}: tempo esgotado`);
@@ -104,5 +112,11 @@ if (!pub.ok) {
 }
 const pubId = operationId(pub.headers.get("location"));
 console.log(`publicação enviada (HTTP ${pub.status}), operação ${pubId}`);
-await poll(`${product}/submissions/operations/${pubId}`, "publicação");
+try {
+  await poll(`${product}/submissions/operations/${pubId}`, "publicação");
+} catch (e) {
+  console.error(`\n${e.message}`);
+  console.error("O pacote continua no rascunho: refaca a publicacao com --yes quando o bloqueio sumir.");
+  process.exit(1);
+}
 console.log("\nEnviado ao Microsoft Edge Add-ons. O crivo ainda passa pela revisão da loja.");
