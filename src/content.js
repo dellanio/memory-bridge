@@ -1,4 +1,4 @@
-// Content script: lê a última troca (pergunta + resposta) do ChatGPT ou do Gemini,
+// Content script: lê a última troca (pergunta + resposta) do ChatGPT, do Gemini ou do Claude,
 // mostra o botão "Salvar no Mem0" e, no modo automático, envia sozinho.
 (() => {
   if (window.__mem0Bridge) return;
@@ -7,7 +7,7 @@
   const txt = (el) => (el ? (el.innerText || el.textContent || "").trim() : "");
   const last = (list) => (list.length ? list[list.length - 1] : null);
   // texto da mensagem sem o rótulo de acessibilidade ("Você disse:", "ChatGPT said:")
-  const LABEL_RE = /^(Você disse|O ChatGPT disse|You said|ChatGPT said|Gemini disse|Gemini said)\s*:?\s*/i;
+  const LABEL_RE = /^(Você disse|O ChatGPT disse|You said|ChatGPT said|Gemini disse|Gemini said|Claude respondeu|Claude responded)\s*:?\s*/i;
   const msgText = (el) => {
     const label = el.querySelector("[data-message-attribution]");
     let t = txt(el);
@@ -119,6 +119,40 @@
         const q = u.querySelector(".query-text") || u;
         const r = a.querySelector("message-content") || a.querySelector(".model-response-text") || a;
         return { user: txt(q).replace(LABEL_RE, ""), assistant: txt(r).replace(LABEL_RE, "") };
+      },
+    },
+    // Claude (claude.ai). DOM verificado na conta logada em 11/11/2026:
+    //   linha da troca: [data-testid="transcript-row"] com data-perf-row="human"|"assistant"
+    //   texto do usuário: [data-testid="user-message"]
+    //   texto do Claude: [data-perf-reply-text] (dentro de .standard-markdown)
+    // A transcrição é virtualizada: só ~4 linhas ficam montadas por vez (o total está em
+    // aria-setsize do article dentro da linha). Por isso o que vale é a última troca montada.
+    // Os <h3 class="sr-only"> ("Você disse:", "Claude respondeu:") ficam fora dos nós lidos
+    // acima, mas o rótulo é removido assim mesmo, por segurança.
+    claude: {
+      match: /(^|\.)claude\.ai$/,
+      // a URL da conversa é https://claude.ai/chat/<uuid>
+      conversationId: () => (location.pathname.match(/\/chat\/([\w-]+)/) || [])[1] || null,
+      turns: () => [...document.querySelectorAll('[data-testid="transcript-row"]')].map((el) => ({
+        el, role: el.getAttribute("data-perf-row") === "human" ? "user" : "assistant",
+      })),
+      generating() {
+        // o Claude marca a mensagem em voo; mais confiável que o aria-label (traduzido)
+        if (document.querySelector('[data-testid="assistant-message"][data-is-streaming="true"]')) return "streaming";
+        if (document.querySelector('[data-testid="transcript-row"][data-perf-row-streaming="true"]')) return "streaming";
+        const s = stopButton();
+        return s ? "botão " + s.getAttribute("aria-label") : "";
+      },
+      lastExchange() {
+        const rows = [...document.querySelectorAll('[data-testid="transcript-row"]')];
+        const u = last(rows.filter((r) => r.getAttribute("data-perf-row") === "human"));
+        const a = last(rows.filter((r) => r.getAttribute("data-perf-row") === "assistant"));
+        if (!u || !a) return null;
+        const uel = u.querySelector('[data-testid="user-message"]');
+        const ael = a.querySelector("[data-perf-reply-text]") || a.querySelector(".standard-markdown")
+          || a.querySelector('[data-testid="assistant-message"] .prose');
+        if (!uel || !ael) return null;
+        return { user: txt(uel).replace(LABEL_RE, ""), assistant: txt(ael).replace(LABEL_RE, "") };
       },
     },
   };
@@ -266,8 +300,13 @@
     const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
     return {
       site, path: location.pathname, at: new Date().toISOString(), version: chrome.runtime.getManifest().version,
+      conv: A.conversationId(),
       settings: settings ? { enabled: settings.enabled, mode: settings.mode, site: settings.sites[site], userId: !!settings.userId } : null,
       turns: turns.length, roles: turns.slice(-6).map((x) => x.role).join(","),
+      // no Claude a transcrição é virtualizada: "turns" é só a janela montada
+      totalMsgs: site === "claude"
+        ? (document.querySelector('[data-testid="transcript-row"] [role="article"]')?.getAttribute("aria-setsize") || null)
+        : null,
       legacyRoles: document.querySelectorAll("[data-message-author-role]").length,
       newRoles: document.querySelectorAll("[data-message-role]").length,
       dataTurn: document.querySelectorAll("[data-turn]").length,

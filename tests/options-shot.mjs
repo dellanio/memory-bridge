@@ -1,14 +1,17 @@
-// Screenshot da tela de opções (Edge headless, pt-BR) e checagem do "Aguarde" ao clicar em Conectar.
+// Screenshot da tela de opções (Edge headless) e checagem do "Aguarde" ao clicar em Conectar.
+//   node tests/options-shot.mjs <arquivo-opcoes.png> <arquivo-popup.png> [pt-BR|en-US]
 import { spawn } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 const EXT = resolve(import.meta.dirname, "..");
 const OUT = process.argv[2] || join(process.env.TMPDIR || tmpdir(), "mem0-edge-options.png");
+const OUT_POPUP = process.argv[3] || OUT.replace(/.png$/, "-popup.png");
+const LANG = process.argv[4] || "pt-BR";
 const PORT = 9336, sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const prof = mkdtempSync(join(process.env.TMPDIR || tmpdir(), "edge-opt-"));
 const edge = spawn("C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe", [`--user-data-dir=${prof}`,
-  `--remote-debugging-port=${PORT}`, "--headless=new", "--no-first-run", "--lang=pt-BR",
+  `--remote-debugging-port=${PORT}`, "--headless=new", "--no-first-run", `--lang=${LANG}`,
   `--disable-extensions-except=${EXT}`, `--load-extension=${EXT}`, "about:blank"], { stdio: "ignore" });
 const list = async () => (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json();
 try {
@@ -36,6 +39,7 @@ try {
   await call("Page.navigate", { url: `chrome-extension://${id}/src/popup.html` });
   await sleep(1200);
   const pop = await call("Page.captureScreenshot", { format: "png" });
-  writeFileSync(OUT.replace(/.png$/, "-popup.png"), Buffer.from(pop.result.data, "base64"));
+  writeFileSync(OUT_POPUP, Buffer.from(pop.result.data, "base64"));
+  console.log("popup:", OUT_POPUP);
   ws.close();
 } finally { edge.kill(); await sleep(800); try { rmSync(prof, { recursive: true, force: true }); } catch {} }

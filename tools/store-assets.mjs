@@ -26,8 +26,8 @@ function cdp(url) {
 }
 const suffix = LANG.startsWith("pt") ? "pt" : "en";
 const T = suffix === "pt"
-  ? { tag: "Suas conversas do ChatGPT e do Gemini viram memória no Mem0", sub: "Integração com Mem0" }
-  : { tag: "Turn your ChatGPT and Gemini chats into Mem0 memories", sub: "Mem0 Integration" };
+  ? { tag: "Suas conversas do ChatGPT, do Gemini e do Claude viram memória no Mem0", sub: "Integração com Mem0" }
+  : { tag: "Turn your ChatGPT, Gemini and Claude chats into Mem0 memories", sub: "Mem0 Integration" };
 
 try {
   let sw;
@@ -42,6 +42,7 @@ try {
     { at: new Date(now - 60e3).toISOString(), status: "ok", site: "chatgpt", preview: sample[3] },
     { at: new Date(now - 6e5).toISOString(), status: "none", site: "gemini", preview: suffix === "pt" ? "Quanto é 12 vezes 12?" : "What is 12 times 12?" },
     { at: new Date(now - 9e5).toISOString(), status: "ok", site: "gemini", preview: sample[1] },
+    { at: new Date(now - 3e5).toISOString(), status: "ok", site: "claude", preview: suffix === "pt" ? "Usuário usa Claude para revisar código" : "User uses Claude to review code" },
     { at: new Date(now - 2e6).toISOString(), status: "ok", site: "chatgpt", preview: sample[2] },
     { at: new Date(now - 4e6).toISOString(), status: "ok", site: "gemini", preview: sample[0] },
   ];
@@ -52,9 +53,11 @@ try {
   const page = (await list()).find((t) => t.type === "page");
   const P = cdp(page.webSocketDebuggerUrl);
   await P.call("Page.enable");
-  const shot = async (file, w, h) => {
+  const shot = async (file, w, h, noClip = false) => {
     await sleep(900);
-    const r = await P.call("Page.captureScreenshot", { format: "png", clip: { x: 0, y: 0, width: w, height: h, scale: 1 } });
+    const r = await P.call("Page.captureScreenshot", noClip
+      ? { format: "png" }
+      : { format: "png", clip: { x: 0, y: 0, width: w, height: h, scale: 1 } });
     writeFileSync(join(OUT, file), Buffer.from(r.result.data, "base64")); console.log(join(OUT, file));
   };
   const size = (w, h) => P.call("Emulation.setDeviceMetricsOverride", { width: w, height: h, deviceScaleFactor: 1, mobile: false });
@@ -66,21 +69,28 @@ try {
   await shot("logo-300.png", 300, 300);
   await P.call("Emulation.setDefaultBackgroundColorOverride", {});
 
-  // 2) tela de configurações 1280x800
+  // 2) tela de configurações 1280x800 (rolada até a seção de sites, com ChatGPT, Gemini e Claude)
   await size(1280, 800);
   await P.call("Page.navigate", { url: `chrome-extension://${id}/src/options.html` });
   await sleep(800);
   await P.ev(`(() => { const s = document.createElement("style"); s.textContent = "::-webkit-scrollbar{display:none}"; document.head.appendChild(s); return true })()`);
-  await shot(`screenshot-1-options-${suffix}.png`, 1280, 800);
+  await P.ev(`(() => {
+    const alvo = [...document.querySelectorAll('*')].find((el) =>
+      el.children.length === 0 && /claude/i.test(el.textContent || '') && el.getBoundingClientRect().width > 0);
+    if (alvo) alvo.scrollIntoView({ block: 'center' });
+    return !!alvo;
+  })()`);
+  await sleep(500);
+  await shot(`screenshot-1-options-${suffix}.png`, 1280, 800, true);
 
   // 3) popup ampliado sobre fundo da marca, 1280x800
   await P.call("Page.navigate", { url: `chrome-extension://${id}/src/popup.html` });
   await sleep(800);
   await P.ev(`(() => { const h = document.documentElement; h.style.cssText = "min-height:800px;background:linear-gradient(120deg,#2a1260,#5b2bc4 55%,#8e5cf7);display:flex;align-items:center;justify-content:center";
-    document.body.style.cssText += ";zoom:1.45;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45);margin:70px 0 0";
+    document.body.style.cssText += ";zoom:1.3;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.45);margin:70px 0 0";
     document.querySelector("ul.log").style.maxHeight = "none";
     const cap = document.createElement("div"); cap.textContent = ${JSON.stringify(T.tag)};
-    cap.style.cssText = "position:fixed;left:0;right:0;top:34px;text-align:center;color:#fff;font:700 30px system-ui,Segoe UI,sans-serif;zoom:" + (1 / 1.45);
+    cap.style.cssText = "position:fixed;left:0;right:0;top:34px;text-align:center;color:#fff;font:700 30px system-ui,Segoe UI,sans-serif;zoom:" + (1 / 1.3);
     document.body.appendChild(cap); return true })()`);
   await shot(`screenshot-2-popup-${suffix}.png`, 1280, 800);
 

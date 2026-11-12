@@ -26,8 +26,8 @@ const DEFAULTS = {
   userId: "",
   apiKey: "",
   mode: "manual",             // "manual" | "auto"
-  sites: { chatgpt: true, gemini: true },
-  appIds: { chatgpt: "chatgpt", gemini: "gemini" },
+  sites: { chatgpt: true, gemini: true, claude: true },
+  appIds: { chatgpt: "chatgpt", gemini: "gemini", claude: "claude" },
   redactSecrets: true,
   instructions: null,         // null = instrução padrão no idioma escolhido
   language: "auto",           // "auto" (idioma do navegador) | "pt_BR" | "en"
@@ -428,7 +428,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
       case "diag": await chrome.storage.session.set({ [`diag_${msg.data.site}`]: msg.data }); return { ok: true };
       case "defaultInstructions": return { text: await defaultInstructions() };
       case "i18n": { const lang = await currentLang(); return { lang, messages: await dict(lang) }; }
-      case "getDiag": return chrome.storage.session.get(["diag_chatgpt", "diag_gemini"]);
+      case "getDiag": return chrome.storage.session.get(["diag_chatgpt", "diag_gemini", "diag_claude"]);
       case "getState": return { settings: await getSettings(), auth: !!(await getAuth())?.accessToken,
         log: (await chrome.storage.local.get("log")).log || [] };
       case "setSettings": await setSettings(msg.patch); return { ok: true };

@@ -1,6 +1,8 @@
 const $ = (id) => document.getElementById(id);
 const msg = (m) => chrome.runtime.sendMessage(m);
 const t = (k) => window.tr(k);
+// sites suportados: a mesma lista do manifest e do service worker
+const SITES = ["chatgpt", "gemini", "claude"];
 
 async function load() {
   await window.i18nReady;
@@ -12,7 +14,7 @@ async function load() {
   document.querySelector(`input[name=mode][value=${s.mode}]`).checked = true;
   $("apiKey").value = s.apiKey || "";
   $("userId").value = s.userId || "";
-  for (const k of ["chatgpt", "gemini"]) { $(`site_${k}`).checked = !!s.sites[k]; $(`app_${k}`).value = s.appIds[k] || k; }
+  for (const k of SITES) { $(`site_${k}`).checked = !!s.sites[k]; $(`app_${k}`).value = s.appIds[k] || k; }
   $("redact").checked = !!s.redactSecrets;
   $("instructions").value = s.instructions || "";
   // nos modos com chave de API o estado é a própria chave, não o OAuth
@@ -35,8 +37,8 @@ function collect() {
     mode: document.querySelector("input[name=mode]:checked").value,
     apiKey: $("apiKey").value.trim(),
     userId: $("userId").value.trim(),
-    sites: { chatgpt: $("site_chatgpt").checked, gemini: $("site_gemini").checked },
-    appIds: { chatgpt: $("app_chatgpt").value.trim() || "chatgpt", gemini: $("app_gemini").value.trim() || "gemini" },
+    sites: Object.fromEntries(SITES.map((k) => [k, $(`site_${k}`).checked])),
+    appIds: Object.fromEntries(SITES.map((k) => [k, $(`app_${k}`).value.trim() || k])),
     redactSecrets: $("redact").checked,
     instructions: $("instructions").value.trim(),
   };

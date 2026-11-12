@@ -3,7 +3,7 @@
     "message": "Memory Bridge for Mem0"
   },
   "extDesc": {
-    "message": "Automatically save what matters from your ChatGPT and Gemini chats to your own Mem0 account."
+    "message": "Automatically save what matters from your ChatGPT, Gemini and Claude chats to your own Mem0 account."
   },
   "btnSave": {
     "message": "Save to Mem0"
@@ -132,7 +132,7 @@
     "message": "Diagnose this tab"
   },
   "diagNoTab": {
-    "message": "The extension is not active in this tab. Open chatgpt.com or gemini.google.com in Edge and reload the page."
+    "message": "The extension is not active in this tab. Open chatgpt.com, gemini.google.com or claude.ai in Edge and reload the page."
   },
   "secFilter": {
     "message": "Memory filter"

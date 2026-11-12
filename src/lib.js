@@ -98,8 +98,7 @@ export function restBody(ex, settings) {
   return body;
 }
 
-// ---------- erros de autenticação ----------
-// O Mem0 registra o cliente dinamicamente (RFC 7591) e pode perder esse registro a
+// ---------- erros de autenticação ----------// O Mem0 registra o cliente dinamicamente (RFC 7591) e pode perder esse registro a
 // cada deploy/rotação do servidor. Quando isso acontece, o /token responde
 // invalid_client e o login fica morto para sempre sem um caminho de recuperação.
 // A distinção importa: "client_invalid" = o servidor não conhece mais o client_id

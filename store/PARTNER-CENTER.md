@@ -13,10 +13,10 @@ Arquivos (pasta `D:\projetos-pessoal\mem0-edge\`):
 
 - Protótipo funcionando: ✔
 - Conta de desenvolvedor: **sua parte** (Partner Center → Programas → Microsoft Edge → Introdução, conta **Individual**).
-- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.0.3.zip`
+- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.1.0.zip`
 - Campos do manifest que viram texto da loja (não editáveis no Partner Center):
   - Nome: "Memory Bridge for Mem0" / "Memory Bridge para Mem0"
-  - Descrição curta: "Automatically save what matters from your ChatGPT and Gemini chats to your own Mem0 account." / "Salve automaticamente o que importa das suas conversas do ChatGPT e do Gemini na sua própria conta Mem0."
+  - Descrição curta: "Automatically save what matters from your ChatGPT, Gemini and Claude chats to your own Mem0 account." / "Salve automaticamente o que importa das suas conversas do ChatGPT, Gemini e Claude na sua própria conta Mem0."
 
 ## Etapa 2 — Criar a extensão
 
@@ -24,7 +24,7 @@ Partner Center → **Página inicial** → cartão **Edge** → **Create new ext
 
 ## Etapa 3 — Enviar o pacote
 
-Arraste `dist\memory-bridge-1.0.3.zip` → aguarde a validação → **Continue**.
+Arraste `dist\memory-bridge-1.1.0.zip` → aguarde a validação → **Continue**.
 O Partner Center deve listar **dois idiomas** (en e pt_BR). Se aparecer só um, ver "If a single locale appears" na página da Microsoft.
 
 ### Atalho: publicar pela API oficial (sem Partner Center)
@@ -77,7 +77,7 @@ O script empacota, envia o `.zip` para o rascunho (`POST /v1/products/$productID
 ### Single Purpose Description
 
 ```
-Saves the user's ChatGPT and Gemini conversations to the user's own Mem0 account, so the facts and preferences found in those chats become long-term memory that other Mem0-connected assistants can use. The extension adds a "Save to Mem0" button to chatgpt.com and gemini.google.com and sends the last question and answer to Mem0 when the user clicks it (or automatically, if the user turns on automatic mode).
+Saves the user's ChatGPT, Gemini and Claude conversations to the user's own Mem0 account, so the facts and preferences found in those chats become long-term memory that other Mem0-connected assistants can use. The extension adds a "Save to Mem0" button to chatgpt.com, gemini.google.com and claude.ai and sends the last question and answer to Mem0 when the user clicks it (or automatically, if the user turns on automatic mode).
 ```
 
 ### Permission justification
@@ -107,9 +107,9 @@ The official Mem0 MCP server: OAuth sign-in, token refresh and the add_memory / 
 The official Mem0 REST API, used only when the user chooses to connect with their own Mem0 API key instead of OAuth (add memories, check the processing event, test the key).
 ```
 
-**Content scripts (chatgpt.com, chat.openai.com, gemini.google.com)** — se o formulário pedir:
+**Content scripts (chatgpt.com, chat.openai.com, gemini.google.com, claude.ai)** — se o formulário pedir:
 ```
-Reads the last question and the last answer of the conversation open in the tab and shows the "Save to Mem0" button. The content script runs only on these three sites and does not read other pages, cookies or form fields.
+Reads the last question and the last answer of the conversation open in the tab and shows the "Save to Mem0" button. The content script runs only on these four sites and does not read other pages, cookies or form fields.
 ```
 
 ### Are you using remote code?
@@ -120,7 +120,7 @@ Reads the last question and the last answer of the conversation open in the tab 
 
 Marque **somente**:
 - [x] **Website content** (o texto da pergunta e da resposta da conversa aberta)
-- [x] **Personal communications** (as mensagens que o usuário troca com o ChatGPT/Gemini, enviadas para a conta Mem0 dele)
+- [x] **Personal communications** (as mensagens que o usuário troca com o ChatGPT, o Gemini ou o Claude, enviadas para a conta Mem0 dele)
 
 Não marque: identificação pessoal, saúde, finanças, autenticação, localização, histórico de navegação, atividade do usuário.
 
@@ -152,7 +152,7 @@ Clique **Edit details** em cada linha (English e Português).
 | Small promotional tile | `store\promo-440x280-en.png` | `store\promo-440x280-pt.png` |
 | Large promotional tile | `store\promo-1400x560-en.png` | `store\promo-1400x560-pt.png` |
 | Screenshots | `screenshot-1-options-en.png`, `screenshot-2-popup-en.png` | `screenshot-1-options-pt.png`, `screenshot-2-popup-pt.png` |
-| Search terms | `mem0`, `memory`, `chatgpt`, `gemini`, `ai memory`, `productivity`, `context` | `mem0`, `memória`, `chatgpt`, `gemini`, `memória ia`, `produtividade`, `contexto` |
+| Search terms | `mem0`, `memory`, `chatgpt`, `gemini`, `claude`, `ai memory`, `productivity`, `context` | `mem0`, `memória`, `chatgpt`, `gemini`, `claude`, `memória ia`, `produtividade`, `contexto` |
 
 Não use o botão "Generate with AI": a descrição pronta já foi revisada.
 **Save draft** em cada idioma. A coluna Status deve ficar **Complete** nas duas linhas.
@@ -171,6 +171,7 @@ The extension needs a free Mem0 account (https://app.mem0.ai) to be tested. No o
 5. A few seconds after the answer, the purple "Save to Mem0" button at the bottom right turns green ("Saved ✓"), and the toolbar popup lists the memory created (e.g. "User's favorite food is pizza").
 6. Send a question with nothing personal (e.g. "What is 12 x 12?"): the button only blinks grey, because Mem0 decides there is nothing worth keeping.
 7. The same works on https://gemini.google.com (requires a Google account).
+8. The same "Save to Mem0" button is injected on https://claude.ai — open any conversation there (a free Anthropic account is required to chat) and the button appears at the bottom right, saving the last exchange in the same way. The settings page shows a separate "Claude" site with its own app_id (claude).
 
 The interface is available in English (US) and Portuguese (Brazil); the language can be changed at the top of the settings page.
 No remote code is used. The only servers contacted are mcp.mem0.ai and api.mem0.ai. Source code: https://github.com/dellanio/memory-bridge
@@ -183,5 +184,5 @@ No remote code is used. The only servers contacted are mcp.mem0.ai and api.mem0.
 ## Se der erro
 
 - **Validação do pacote falhou**: mande o print da mensagem.
-- **Só um idioma aparece**: confirme que enviou o 1.0.3 (tem `_locales/en` e `_locales/pt_BR`).
-- **Rejeitado por permissão ou marca**: mande o texto da rejeição; a correção vai num novo `.zip` com versão maior (1.0.3…).
+- **Só um idioma aparece**: confirme que enviou o 1.1.0 (tem `_locales/en` e `_locales/pt_BR`).
+- **Rejeitado por permissão ou marca**: mande o texto da rejeição; a correção vai num novo `.zip` com versão maior (1.1.0…).

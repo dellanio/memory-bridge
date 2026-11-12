@@ -4,11 +4,11 @@ title: Memory Bridge for Mem0 — Privacy Policy / Política de Privacidade
 
 # Memory Bridge for Mem0 — Privacy Policy
 
-*Last updated: October 7, 2026*
+*Last updated: November 12, 2026*
 
-Memory Bridge for Mem0 ("the extension") is an independent browser extension, not affiliated with Mem0, OpenAI or Google.
+Memory Bridge for Mem0 ("the extension") is an independent browser extension, not affiliated with Mem0, OpenAI, Google or Anthropic.
 
-**What the extension reads.** Only on `chatgpt.com`, `chat.openai.com` and `gemini.google.com`, and only the last question and the last answer of the conversation that is open in the tab.
+**What the extension reads.** Only on `chatgpt.com`, `chat.openai.com`, `gemini.google.com` and `claude.ai`, and only the last question and the last answer of the conversation that is open in the tab.
 
 **When it sends data.** When you click "Save to Mem0" or, if you turn on automatic mode, when an answer finishes.
 
@@ -26,11 +26,11 @@ Memory Bridge for Mem0 ("the extension") is an independent browser extension, no
 
 # Memory Bridge para Mem0 — Política de Privacidade
 
-*Atualizada em 7 de outubro de 2026*
+*Atualizada em 12 de novembro de 2026*
 
-O Memory Bridge para Mem0 ("a extensão") é uma extensão independente, sem vínculo com a Mem0, a OpenAI ou o Google.
+O Memory Bridge para Mem0 ("a extensão") é uma extensão independente, sem vínculo com a Mem0, a OpenAI, o Google ou a Anthropic.
 
-**O que a extensão lê.** Somente em `chatgpt.com`, `chat.openai.com` e `gemini.google.com`, e somente a última pergunta e a última resposta da conversa aberta na aba.
+**O que a extensão lê.** Somente em `chatgpt.com`, `chat.openai.com`, `gemini.google.com` e `claude.ai`, e somente a última pergunta e a última resposta da conversa aberta na aba.
 
 **Quando envia.** Quando você clica em "Salvar no Mem0" ou, se ligar o modo automático, quando uma resposta termina.
 
