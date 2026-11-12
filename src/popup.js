@@ -5,7 +5,8 @@ async function load() {
   await window.i18nReady;
   const { settings: s, auth, log } = await msg({ type: "getState" });
   $("enabled").checked = s.enabled;
-  const how = s.authMode === "apikey" ? "API key" : auth ? "OAuth ✓" : "OAuth ✗";
+  const how = s.authMode === "apikey" ? "API key (REST)" : s.authMode === "apikey-mcp" ? "API key (MCP)"
+    : auth ? "OAuth ✓" : "OAuth ✗";
   $("who").textContent = s.userId ? `user_id: ${s.userId} · ${how} · ${s.mode}` : window.tr("needUser");
   const ul = $("log");
   ul.replaceChildren();
@@ -21,6 +22,21 @@ async function load() {
   }
 }
 $("enabled").onchange = (e) => msg({ type: "setSettings", patch: { enabled: e.target.checked } });
+// Reconectar: refaz o login OAuth sem sair do popup. Se o Mem0 tiver descartado o
+// cliente registrado, a extensão registra um novo e o login volta sozinho.
+$("reconnect").onclick = async () => {
+  const b = $("reconnect");
+  if (b.disabled) return;
+  b.disabled = true;
+  const who = $("who");
+  who.textContent = window.tr("optWaiting");
+  let r;
+  try { r = await msg({ type: "login" }); }
+  catch (e) { r = { ok: false, error: String(e.message || e) }; }
+  b.disabled = false;
+  if (r && r.ok === false) { who.textContent = r.error || window.tr("errGeneric"); return; }
+  await load();
+};
 $("opts").onclick = () => chrome.runtime.openOptionsPage();
 $("diagBtn").onclick = async () => {
   const out = $("diag");

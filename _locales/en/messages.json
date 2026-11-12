@@ -41,6 +41,9 @@
   "authApikey": {
     "message": "API key (advanced)"
   },
+  "authApikeyMcp": {
+    "message": "API key on the MCP server (no OAuth — works even when Mem0's client registration is down)"
+  },
   "connect": {
     "message": "Connect"
   },
@@ -100,6 +103,9 @@
   },
   "popOptions": {
     "message": "Settings"
+  },
+  "popReconnect": {
+    "message": "Reconnect"
   },
   "popClear": {
     "message": "Clear"
@@ -169,6 +175,12 @@
   },
   "errUnauthorized": {
     "message": "Mem0 rejected the sign-in: connect again"
+  },
+  "errClientInvalid": {
+    "message": "Mem0 no longer recognizes this extension's sign-in (the client registration was dropped on the server). Open Settings and click Connect to register a new client."
+  },
+  "errDcrUnavailable": {
+    "message": "The Mem0 server is refusing new client registrations (HTTP $1). Use an API key (MCP or REST) in Settings in the meantime."
   },
   "errNoApiKey": {
     "message": "API key not set"

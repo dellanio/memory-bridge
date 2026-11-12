@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import {
   eventIdOf, eventOutcome,
   redact, clean, prepareExchange, exchangeKey, buildAddArgs, restBody,
-  parseMcpResponse, toolResultText, pkceChallenge, b64url,
+  parseMcpResponse, toolResultText, pkceChallenge, b64url, authErrorKind,
 } from "../src/lib.js";
 
 const ex = { site: "gemini", conversationId: "abc", url: "https://gemini.google.com/app/abc",
@@ -107,4 +107,16 @@ test("evento do Mem0: id e resultado (REST e MCP)", () => {
   const mcp = { content: [{ type: "text", text: JSON.stringify({ status: "SUCCEEDED", results: [] }) }] };
   assert.deepEqual(eventOutcome(mcp), { done: true, memories: [] });
   assert.equal(eventOutcome({ status: "FAILED", error: "x" }).failed, true);
+});
+
+// O Mem0 perde o cliente registrado a cada deploy do servidor: quando isso acontece
+// o /token responde invalid_client e a extensão precisa se refazer (client_invalid),
+// em vez de dar erro de token genérico e ficar sem recuperação.
+test("authErrorKind separa cliente perdido de refresh token inválido", () => {
+  assert.equal(authErrorKind(401, { error: "invalid_client", error_description: "Invalid client_id" }), "client_invalid");
+  assert.equal(authErrorKind(401, { error: "invalid_client", error_description: "Missing client_id" }), "client_invalid");
+  assert.equal(authErrorKind(400, { error: "invalid_request", error_description: "Client ID 'x' not found" }), "client_invalid");
+  assert.equal(authErrorKind(401, { error: "invalid_grant", error_description: "expired" }), "grant_invalid");
+  assert.equal(authErrorKind(401, {}), "unauthorized");
+  assert.equal(authErrorKind(500, {}), "other");
 });

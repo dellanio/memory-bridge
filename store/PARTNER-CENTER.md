@@ -4,7 +4,7 @@ Segue as etapas de https://learn.microsoft.com/en-us/microsoft-edge/extensions/p
 Tudo o que estiver em bloco de código é para **copiar e colar** no campo indicado.
 
 Arquivos (pasta `D:\projetos-pessoal\mem0-edge\`):
-- Pacote: `dist\memory-bridge-1.0.2.zip`
+- Pacote: `dist\memory-bridge-1.0.3.zip`
 - Imagens: `store\`
 
 ---
@@ -13,7 +13,7 @@ Arquivos (pasta `D:\projetos-pessoal\mem0-edge\`):
 
 - Protótipo funcionando: ✔
 - Conta de desenvolvedor: **sua parte** (Partner Center → Programas → Microsoft Edge → Introdução, conta **Individual**).
-- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.0.2.zip`
+- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.0.3.zip`
 - Campos do manifest que viram texto da loja (não editáveis no Partner Center):
   - Nome: "Memory Bridge for Mem0" / "Memory Bridge para Mem0"
   - Descrição curta: "Automatically save what matters from your ChatGPT and Gemini chats to your own Mem0 account." / "Salve automaticamente o que importa das suas conversas do ChatGPT e do Gemini na sua própria conta Mem0."
@@ -24,8 +24,36 @@ Partner Center → **Página inicial** → cartão **Edge** → **Create new ext
 
 ## Etapa 3 — Enviar o pacote
 
-Arraste `dist\memory-bridge-1.0.2.zip` → aguarde a validação → **Continue**.
+Arraste `dist\memory-bridge-1.0.3.zip` → aguarde a validação → **Continue**.
 O Partner Center deve listar **dois idiomas** (en e pt_BR). Se aparecer só um, ver "If a single locale appears" na página da Microsoft.
+
+### Atalho: publicar pela API oficial (sem Partner Center)
+
+Depois da primeira publicação, dá para subir a próxima versão pela **API de update do Edge Add-ons** (REST v1.1), que existe para CI/CD.
+
+Dados desta extensão:
+
+| | |
+|---|---|
+| Product ID | `c092211a-4fae-493b-a048-7f8cb12c13fd` |
+| Store ID | `0RDCKB8HRMN4` |
+| CRX ID | `hajblgdoncpkaojaklgpmndibhdoaice` |
+| Client ID (Publish API) | `7733d7a4-f45c-4a11-8800-bf498221f3b4` |
+
+1. Partner Center → **Microsoft Edge** → **Publish API** (`partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi`) → **Turn on API**. O botão liga a API e **cria as credenciais na hora** (Client ID + API key). **A chave só é exibida nessa sessão** ("It won't be available for copy in your next session") — copie na hora.
+2. As credenciais ficam em `store/edge-credentials.local.json` (no `.gitignore`, nunca vai para o git). O script lê esse arquivo; variáveis de ambiente (`EDGE_PRODUCT_ID`, `EDGE_CLIENT_ID`, `EDGE_API_KEY`) têm precedência.
+3. Na pasta do projeto:
+
+```
+npm run package
+npm run publish:edge -- --dry-run     # mostra o plano sem enviar
+npm run publish:edge -- --yes         # sobe o pacote e publica
+npm run publish:edge -- --yes --notes "texto para a certificação"
+```
+
+O script empacota, envia o `.zip` para o rascunho (`POST /v1/products/$productID/submissions/draft/package`), acompanha a operação e publica (`POST /v1/products/$productID/submissions`). Sem `--yes` ele para no rascunho. A API **não** serve para criar produto novo nem para mexer em metadados (descrição, capturas) — isso continua sendo pela tela.
+
+> Histórico: 1.0.2 publicada em 07/10/2026 pela tela. 1.0.3 publicada em 11/11/2026 pela API (upload e publicação `succeeded`; status "In review").
 
 ## Etapa 4 — Disponibilidade (Availability)
 
@@ -155,5 +183,5 @@ No remote code is used. The only servers contacted are mcp.mem0.ai and api.mem0.
 ## Se der erro
 
 - **Validação do pacote falhou**: mande o print da mensagem.
-- **Só um idioma aparece**: confirme que enviou o 1.0.2 (tem `_locales/en` e `_locales/pt_BR`).
-- **Rejeitado por permissão ou marca**: mande o texto da rejeição; a correção vai num novo `.zip` com versão maior (1.0.2…).
+- **Só um idioma aparece**: confirme que enviou o 1.0.3 (tem `_locales/en` e `_locales/pt_BR`).
+- **Rejeitado por permissão ou marca**: mande o texto da rejeição; a correção vai num novo `.zip` com versão maior (1.0.3…).

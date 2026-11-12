@@ -41,6 +41,9 @@
   "authApikey": {
     "message": "Chave de API (avançado)"
   },
+  "authApikeyMcp": {
+    "message": "Chave de API no servidor MCP (sem OAuth — funciona mesmo com o registro de cliente do Mem0 fora do ar)"
+  },
   "connect": {
     "message": "Conectar"
   },
@@ -100,6 +103,9 @@
   },
   "popOptions": {
     "message": "Configurações"
+  },
+  "popReconnect": {
+    "message": "Reconectar"
   },
   "popClear": {
     "message": "Limpar"
@@ -169,6 +175,12 @@
   },
   "errUnauthorized": {
     "message": "O Mem0 recusou o login: conecte de novo"
+  },
+  "errClientInvalid": {
+    "message": "O Mem0 não reconhece mais este login da extensão (o registro do cliente foi descartado no servidor). Abra as Configurações e clique em Conectar para registrar um cliente novo."
+  },
+  "errDcrUnavailable": {
+    "message": "O servidor do Mem0 está recusando novos registros de cliente (HTTP $1). Use a chave de API (MCP ou REST) nas Configurações enquanto isso."
   },
   "errNoApiKey": {
     "message": "Chave de API não configurada"

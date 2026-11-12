@@ -2,7 +2,7 @@
 import {
   MCP_URL, MCP_ISSUER, REST_ADD_URL, randomString, pkceChallenge,
   prepareExchange, exchangeKey, restBody, buildAddArgs, parseMcpResponse, toolResultText,
-  eventIdOf, eventOutcome,
+  eventIdOf, eventOutcome, authErrorKind,
 } from "./lib.js";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const EVENT_WAIT_MS = 30000, EVENT_POLL_MS = 1500;
@@ -21,7 +21,8 @@ async function waitEvent(check) {
 
 const DEFAULTS = {
   enabled: true,
-  authMode: "oauth",          // "oauth" (MCP do Mem0) | "apikey" (API REST)
+  // "oauth" (MCP do Mem0) | "apikey-mcp" (MCP com chave de API) | "apikey" (API REST)
+  authMode: "oauth",
   userId: "",
   apiKey: "",
   mode: "manual",             // "manual" | "auto"
@@ -139,18 +140,53 @@ async function registerClient(meta, redirectUri) {
       token_endpoint_auth_method: "none", scope: "read write",
     }),
   });
-  if (!r.ok) throw new Error(`registro do cliente: HTTP ${r.status}`);
-  return r.json();
+  const body = await r.json().catch(() => null);
+  if (!r.ok) {
+    // 5xx = o registro dinâmico do Mem0 está fora do ar (a store de clientes caiu):
+    // não adianta tentar de novo, o caminho é a chave de API.
+    if (r.status >= 500) throw new Error(await T("errDcrUnavailable", r.status));
+    const why = (body && (body.error_description || body.error)) || `HTTP ${r.status}`;
+    throw new Error(`registro do cliente: ${why}`);
+  }
+  return body;
 }
 
-async function tokenRequest(meta, params) {
+// O Mem0 guarda o cliente registrado em memória/banco que pode ser recriado a cada
+// deploy. Quando o registro some, o /token responde invalid_client e a extensão
+// fica sem caminho de recuperação se não sondar antes. O probe pergunta ao servidor
+// se ele ainda conhece o client_id guardado (não consome nada: o refresh_token é falso):
+//   invalid_client -> o servidor não conhece mais o cliente -> refaz o registro
+//   invalid_grant  -> o cliente continua válido -> só o refresh token está ruim
+async function probeClient(meta, clientId) {
+  try {
+    const r = await fetch(meta.token_endpoint, {
+      method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        grant_type: "refresh_token", refresh_token: "probe",
+        client_id: clientId, resource: MCP_ISSUER,
+      }),
+    });
+    const body = await r.json().catch(() => ({}));
+    return authErrorKind(r.status, body);
+  } catch { return "unknown"; }
+}
+
+async function tokenRequest(meta, params, clientSecret) {
+  const body = new URLSearchParams(params);
+  if (clientSecret) body.set("client_secret", clientSecret);
   const r = await fetch(meta.token_endpoint, {
     method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams(params),
+    body,
   });
-  const body = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`token: HTTP ${r.status} ${body.error || ""}`.trim());
-  return body;
+  const json = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const kind = authErrorKind(r.status, json);
+    const desc = json.error_description || "";
+    const err = new Error(`token: HTTP ${r.status} ${json.error || ""}${desc ? ` (${desc})` : ""}`.trim());
+    err.kind = kind;
+    throw err;
+  }
+  return json;
 }
 
 function storeTokens(auth, t) {
@@ -159,13 +195,19 @@ function storeTokens(auth, t) {
     expiresAt: Date.now() + ((t.expires_in || 3600) - 60) * 1000 };
 }
 
-async function login() {
+async function login({ force = false } = {}) {
   const meta = await oauthMeta();
   const redirectUri = chrome.identity.getRedirectURL();
   let auth = await getAuth();
-  if (!auth || auth.redirectUri !== redirectUri || !auth.clientId) {
+  if (auth && auth.clientId && !force && auth.redirectUri === redirectUri) {
+    // o registro do cliente pode ter sumido no servidor: confere antes de usar
+    if (await probeClient(meta, auth.clientId) === "client_invalid") auth = null;
+  }
+  if (!auth || !auth.clientId || auth.redirectUri !== redirectUri) {
     const c = await registerClient(meta, redirectUri);
-    auth = { clientId: c.client_id, redirectUri };
+    auth = { clientId: c.client_id, clientSecret: c.client_secret || null, redirectUri };
+    // guarda o cliente novo já: se o usuário cancelar o navegador, o registro não se perde
+    await setAuth(auth);
   }
   const verifier = randomString(48);
   const state = randomString(16);
@@ -179,10 +221,21 @@ async function login() {
   const q = new URL(back).searchParams;
   if (q.get("error")) throw new Error(await T("errLoginRefused", q.get("error")));
   if (q.get("state") !== state) throw new Error(await T("errLoginInvalid"));
-  const t = await tokenRequest(meta, {
+  const params = {
     grant_type: "authorization_code", code: q.get("code"), redirect_uri: redirectUri,
     client_id: auth.clientId, code_verifier: verifier, resource: MCP_ISSUER,
-  });
+  };
+  let t;
+  try {
+    t = await tokenRequest(meta, params, auth.clientSecret);
+  } catch (e) {
+    if (e.kind !== "client_invalid") throw e;
+    // o cliente morreu entre a sondagem e a troca do código: registra outro e refaz
+    const c = await registerClient(meta, redirectUri);
+    auth = { clientId: c.client_id, clientSecret: c.client_secret || null, redirectUri };
+    await setAuth(auth);
+    t = await tokenRequest(meta, { ...params, client_id: auth.clientId }, auth.clientSecret);
+  }
   auth = storeTokens(auth, t);
   await setAuth(auth);
   await addLog({ status: "ok", site: "-", preview: await T("logConnected") });
@@ -194,10 +247,21 @@ async function accessToken() {
   if (!auth || !auth.accessToken) throw new Error(await T("errNotConnected"));
   if (Date.now() < auth.expiresAt) return auth.accessToken;
   if (!auth.refreshToken) throw new Error(await T("errSessionExpired"));
-  const t = await tokenRequest(await oauthMeta(), {
-    grant_type: "refresh_token", refresh_token: auth.refreshToken,
-    client_id: auth.clientId, resource: MCP_ISSUER,
-  });
+  let t;
+  try {
+    t = await tokenRequest(await oauthMeta(), {
+      grant_type: "refresh_token", refresh_token: auth.refreshToken,
+      client_id: auth.clientId, resource: MCP_ISSUER,
+    }, auth.clientSecret);
+  } catch (e) {
+    if (e.kind === "client_invalid") {
+      // o Mem0 não conhece mais este cliente: joga o login fora (o próximo "Conectar"
+      // registra um cliente novo) e diz o que fazer
+      await setAuth({ clientId: auth.clientId, redirectUri: auth.redirectUri });
+      throw new Error(await T("errClientInvalid"));
+    }
+    throw e;
+  }
   auth = storeTokens(auth, t);
   await setAuth(auth);
   return auth.accessToken;
@@ -219,11 +283,13 @@ async function logout() {
 }
 
 // ---------- cliente MCP mínimo (Streamable HTTP) ----------
+// O header Authorization pode ser "Bearer <token OAuth>" ou "Token <chave de API>":
+// o servidor MCP do Mem0 aceita os dois (a chave começa com m0-).
 let rpcId = 0;
-async function mcpPost(token, sessionId, payload) {
+async function mcpPost(authHeader, sessionId, payload) {
   await originReady;
   const headers = { "Content-Type": "application/json",
-    Accept: "application/json, text/event-stream", Authorization: `Bearer ${token}` };
+    Accept: "application/json, text/event-stream", Authorization: authHeader };
   if (sessionId) headers["Mcp-Session-Id"] = sessionId;
   const r = await fetch(MCP_URL, { method: "POST", headers, body: JSON.stringify(payload) });
   const text = await r.text();
@@ -238,15 +304,14 @@ async function mcpPost(token, sessionId, payload) {
     msg: payload.id === undefined ? null : parseMcpResponse(r.headers.get("Content-Type"), text, payload.id) };
 }
 
-async function mcpSession() {
-  const token = await accessToken();
-  const init = await mcpPost(token, null, { jsonrpc: "2.0", id: ++rpcId, method: "initialize",
+async function mcpSession(authHeader) {
+  const init = await mcpPost(authHeader, null, { jsonrpc: "2.0", id: ++rpcId, method: "initialize",
     params: { protocolVersion: "2025-06-18", capabilities: {},
       clientInfo: { name: "mem0-edge-bridge", version: chrome.runtime.getManifest().version } } });
   if (!init.msg || init.msg.error) throw new Error(`MCP initialize: ${JSON.stringify(init.msg && init.msg.error)}`);
-  await mcpPost(token, init.sessionId, { jsonrpc: "2.0", method: "notifications/initialized" });
+  await mcpPost(authHeader, init.sessionId, { jsonrpc: "2.0", method: "notifications/initialized" });
   const call = async (method, params) => {
-    const { msg } = await mcpPost(token, init.sessionId, { jsonrpc: "2.0", id: ++rpcId, method, params });
+    const { msg } = await mcpPost(authHeader, init.sessionId, { jsonrpc: "2.0", id: ++rpcId, method, params });
     if (!msg) throw new Error(`MCP ${method}: sem resposta`);
     if (msg.error) throw new Error(`MCP ${method}: ${msg.error.message || JSON.stringify(msg.error)}`);
     return msg.result;
@@ -254,17 +319,38 @@ async function mcpSession() {
   return { call };
 }
 
-async function addViaMcp(ex, settings) {
-  const s = await mcpSession();
-  const { tools = [] } = await s.call("tools/list", {});
+// sessão MCP com a chave de API do Mem0 (sem OAuth): o próprio endpoint MCP aceita
+// "Authorization: Token m0-..." e devolve as mesmas ferramentas add_memory/get_event_status.
+async function mcpSessionWithKey(settings) {
+  if (!settings.apiKey) throw new Error(await T("errNoApiKey"));
+  try {
+    return await mcpSession(`Token ${settings.apiKey}`);
+  } catch (e) {
+    if (/401|invalid|api key/i.test(String(e.message || e))) {
+      throw new Error(`${await T("errKeyRefused")}: ${String(e.message || e).slice(0, 160)}`);
+    }
+    throw e;
+  }
+}
+
+async function addMemoryViaMcp(session, ex, settings) {
+  const { tools = [] } = await session.call("tools/list", {});
   const tool = tools.find((t) => t.name === "add_memory") || tools.find((t) => /add.*memor/i.test(t.name));
   if (!tool) throw new Error("o servidor MCP do Mem0 não oferece add_memory");
-  const res = await s.call("tools/call", { name: tool.name, arguments: buildAddArgs(tool.inputSchema, ex, settings) });
+  const res = await session.call("tools/call", { name: tool.name, arguments: buildAddArgs(tool.inputSchema, ex, settings) });
   const text = toolResultText(res);
   if (res.isError) throw new Error(text || "add_memory falhou");
   const id = eventIdOf(res);
   if (!id || !tools.some((t) => t.name === "get_event_status")) return null;
-  return waitEvent(async () => s.call("tools/call", { name: "get_event_status", arguments: { event_id: id } }));
+  return waitEvent(async () => session.call("tools/call", { name: "get_event_status", arguments: { event_id: id } }));
+}
+
+async function addViaMcp(ex, settings) {
+  return addMemoryViaMcp(await mcpSession(`Bearer ${await accessToken()}`), ex, settings);
+}
+
+async function addViaMcpKey(ex, settings) {
+  return addMemoryViaMcp(await mcpSessionWithKey(settings), ex, settings);
 }
 
 async function addViaRest(ex, settings) {
@@ -297,7 +383,10 @@ async function save(raw, { manual }) {
   const key = exchangeKey(ex);
   if (await alreadySent(key)) return { status: "duplicate" };
   try {
-    const memories = settings.authMode === "apikey" ? await addViaRest(ex, settings) : await addViaMcp(ex, settings);
+    let memories;
+    if (settings.authMode === "apikey") memories = await addViaRest(ex, settings);
+    else if (settings.authMode === "apikey-mcp") memories = await addViaMcpKey(ex, settings);
+    else memories = await addViaMcp(ex, settings);
     await markSent(key);
     if (memories === null) {
       await addLog({ status: "pending", site: ex.site, preview: ex.user.slice(0, 90) });
@@ -322,7 +411,12 @@ async function testConnection() {
     if (!r.ok) throw new Error(`${await T("errKeyRefused")}: HTTP ${r.status}`);
     return T("testKeyOk");
   }
-  const s = await mcpSession();
+  if (settings.authMode === "apikey-mcp") {
+    const s = await mcpSessionWithKey(settings);
+    const { tools = [] } = await s.call("tools/list", {});
+    return T("testMcpOk", String(tools.length));
+  }
+  const s = await mcpSession(`Bearer ${await accessToken()}`);
   const { tools = [] } = await s.call("tools/list", {});
   return T("testMcpOk", String(tools.length));
 }
@@ -338,7 +432,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
       case "getState": return { settings: await getSettings(), auth: !!(await getAuth())?.accessToken,
         log: (await chrome.storage.local.get("log")).log || [] };
       case "setSettings": await setSettings(msg.patch); return { ok: true };
-      case "login": return login().then(() => ({ ok: true }));
+      case "login": return login({ force: !!msg.force }).then(() => ({ ok: true }));
       case "logout": await logout(); return { ok: true };
       case "test": return { ok: true, message: await testConnection() };
       case "clearLog": await chrome.storage.local.set({ log: [] }); chrome.action.setBadgeText({ text: "" }); return { ok: true };

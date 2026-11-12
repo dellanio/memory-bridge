@@ -98,6 +98,24 @@ export function restBody(ex, settings) {
   return body;
 }
 
+// ---------- erros de autenticação ----------
+// O Mem0 registra o cliente dinamicamente (RFC 7591) e pode perder esse registro a
+// cada deploy/rotação do servidor. Quando isso acontece, o /token responde
+// invalid_client e o login fica morto para sempre sem um caminho de recuperação.
+// A distinção importa: "client_invalid" = o servidor não conhece mais o client_id
+// (refaz o registro); "grant_invalid" = o cliente é válido, só o refresh token não vale.
+export function authErrorKind(status, body) {
+  const code = String((body && body.error) || "").toLowerCase();
+  const desc = String((body && body.error_description) || "").toLowerCase();
+  if (code === "invalid_client") return "client_invalid";
+  if (desc.includes("invalid client_id")) return "client_invalid";
+  // o /authorize do Mem0 responde 400 invalid_request com "Client ID 'x' not found"
+  if (/client\s*id.*not found/i.test(desc)) return "client_invalid";
+  if (code === "invalid_grant") return "grant_invalid";
+  if (status === 401 || status === 403) return "unauthorized";
+  return "other";
+}
+
 // o schema pode declarar o tipo direto ou via anyOf/oneOf (ex.: array | null)
 export function acceptsArray(prop) {
   if (!prop) return false;

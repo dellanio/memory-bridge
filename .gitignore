@@ -3,3 +3,5 @@ node_modules/
 *.crx
 *.pem
 dist/
+store/edge-credentials.local.json
+mem0-edge-*.patch

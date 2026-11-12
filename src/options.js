@@ -7,15 +7,18 @@ async function load() {
   const { settings: s, auth } = await msg({ type: "getState" });
   $("language").value = s.language || "auto";
   $("userId").placeholder = t("userIdPlaceholder");
-  document.querySelector(`input[name=auth][value=${s.authMode}]`).checked = true;
+  const radio = document.querySelector(`input[name=auth][value=${s.authMode}]`);
+  if (radio) radio.checked = true;
   document.querySelector(`input[name=mode][value=${s.mode}]`).checked = true;
   $("apiKey").value = s.apiKey || "";
   $("userId").value = s.userId || "";
   for (const k of ["chatgpt", "gemini"]) { $(`site_${k}`).checked = !!s.sites[k]; $(`app_${k}`).value = s.appIds[k] || k; }
   $("redact").checked = !!s.redactSecrets;
   $("instructions").value = s.instructions || "";
-  $("authState").textContent = auth ? t("connected") : t("notConnected");
-  $("authState").className = auth ? "pill ok" : "pill";
+  // nos modos com chave de API o estado é a própria chave, não o OAuth
+  const connected = s.authMode === "oauth" ? !!auth : !!(s.apiKey || "").trim();
+  $("authState").textContent = connected ? t("connected") : t("notConnected");
+  $("authState").className = connected ? "pill ok" : "pill";
   $("version").textContent = "v" + chrome.runtime.getManifest().version;
   toggle();
 }
