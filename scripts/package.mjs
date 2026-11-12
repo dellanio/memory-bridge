@@ -1,6 +1,12 @@
 // Gera dist/memory-bridge-<versão>.zip com o manifest.json na raiz.
 // Só entra no pacote o que a extensão usa em tempo de execução:
 // manifest.json, icons/, _locales/ e src/. Nada de testes, store, docs ou node_modules.
+//
+// Uso:
+//   node scripts/package.mjs            -> pacote da loja do Edge
+//   node scripts/package.mjs --chrome   -> pacote da Chrome Web Store
+// O código é o mesmo nos dois canais; o que muda é só o manifesto (o Chrome
+// recebe minimum_chrome_version) e o nome do zip gerado.
 import { readFileSync, writeFileSync, mkdirSync, readdirSync, statSync, rmSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -84,20 +90,32 @@ function zip(files) {
 }
 
 // ---------- empacota ----------
+const chrome = process.argv.includes("--chrome");
 const manifest = JSON.parse(readFileSync(join(ROOT, "manifest.json"), "utf8"));
+// Chrome: APIs usadas → declarativeNetRequestWithHostAccess (96), condição
+// requestDomains (101), storage.session (102), identity.launchWebAuthFlow (106).
+if (chrome) manifest.minimum_chrome_version = "106";
+const manifestText = JSON.stringify(manifest, null, 2) + "\n";
 const version = manifest.version;
 const paths = INCLUDE.flatMap((r) => {
   const p = join(ROOT, r);
   try { return statSync(p).isDirectory() ? walk(p) : [p]; } catch { return []; }
 });
 const files = paths.map((p) => ({ name: relative(ROOT, p), data: readFileSync(p) }));
-const out = join(ROOT, "dist", `memory-bridge-${version}.zip`);
+// O manifesto vai embutido no zip (não lido do disco na hora de gerar),
+// para que a variante do Chrome chegue inteira ao pacote.
+const mf = files.find((f) => f.name === "manifest.json");
+if (!mf) throw new Error("manifest.json não entrou no pacote");
+mf.data = Buffer.from(manifestText, "utf8");
+const suffix = chrome ? "-chrome" : "";
+const out = join(ROOT, "dist", `memory-bridge-${version}${suffix}.zip`);
 mkdirSync(join(ROOT, "dist"), { recursive: true });
 try { rmSync(out); } catch { /* não existia */ }
 writeFileSync(out, zip(files));
 
 const kb = (statSync(out).size / 1024).toFixed(1);
-console.log(`pacote: ${relative(ROOT, out)}  (${kb} KB, ${files.length} arquivos, versão ${version})`);
+console.log(`pacote: ${relative(ROOT, out)}  (${kb} KB, ${files.length} arquivos, versão ${version}${chrome ? ", alvo chrome" : ", alvo edge"})`);
 const top = new Set(files.map((f) => f.name.split(/[\\/]/)[0]));
 console.log("raízes incluídas:", [...top].join(", "));
 if (!files.some((f) => f.name === "manifest.json")) throw new Error("manifest.json não está na raiz do zip");
+if (chrome) console.log("minimum_chrome_version:", manifest.minimum_chrome_version);
