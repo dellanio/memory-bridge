@@ -102,8 +102,17 @@ node tests/lang-check.mjs                 # Edge headless: options, popup and bu
 node tests/auth-heal.mjs                  # Edge headless: a dead sign-in heals itself
 node tests/e2e-edge.mjs                    # Edge headless + extension on the real chatgpt.com (no login)
 node tests/e2e-claude.mjs                  # Edge headless + extension on the real claude.ai (needs a sign-in once)
+E2E_HEADFUL=1 node tests/e2e-claude.mjs    # same, but visible: claude.ai blocks headless (Cloudflare)
+node tests/cdp-eval.mjs page <url> "<js>" # evaluates JS in any tab of the test Edge (port 9337)
+node tests/save-click.mjs                  # clicks the injected button on claude.ai and shows the log
+node tests/claude-send.mjs "<message>"     # sends a message on claude.ai and follows the extension log
 node tests/probe.mjs <url> [ms]            # DOM diagnostics when a site changes
 ```
+
+`tests/e2e-claude.mjs` needs a visible window: the Claude page is behind a Cloudflare check that
+never passes in headless mode ("Um momento…"), and the content script only publishes its diagnostic
+when the tab is not hidden (`document.hidden === false`). The sign-in lives in a fixed profile
+(`%LOCALAPPDATA%\mem0-edge-claude-profile`), so it is asked for only once.
 
 ### Publishing to the store
 
@@ -151,7 +160,8 @@ O Claude renomeia os `data-testid` com frequência, então o adapter lê o texto
 - **Chrome Web Store**: **published** — item `jabbichbmfjhbmpijkpinflnijffkgpe` on account `planoplusdev@gmail.com`, version **1.1.1 live and public** (published 15/11/2026): https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe — en-US listing, public contact `contato@dellanio.com`. Version **1.1.2 (French + Simplified Chinese) is Pending review** since 15/11/2026 and publishes automatically once approved. Its own package is `npm run package:chrome` (`minimum_chrome_version: 106`).
 - **Four languages**: the interface ships in English (US), Portuguese (Brazil), French and Simplified Chinese (`_locales/en`, `pt_BR`, `fr`, `zh_CN`); the language follows the browser or can be set in the settings page. The Chrome Web Store accepts one listing per language, so the fr and zh-CN listings are prepared in `store/CHROME-STORE.md`.
 - Both stores share the same `src/`; only the manifest and the distribution channel differ. Route and pitfalls: `store/PARTNER-CENTER.md` (Edge) and `store/CHROME-STORE.md` (Chrome).
-- Still pending: the Claude adapter has not been validated with a signed-in account, and the Edge item is scheduled to get 1.1.2 (the version with the data-policy consent and the French/Chinese translations) as soon as the 1.1.0 review frees the submission queue.
+- Still pending: the Edge item is scheduled to get 1.1.2 (the version with the data-policy consent and the French/Chinese translations) as soon as the 1.1.0 review frees the submission queue.
+- **Claude validated with a signed-in account** (15/11/2026, `tests/e2e-claude.mjs`): the adapter reads the last mounted exchange, extracts the conversation id from the URL, the OAuth sign-in against Mem0 completes, and both the manual button and the automatic mode write the extracted memories to the account (log `status: ok`).
 
 ## Publicação (Edge Add-ons e Chrome Web Store)
 
@@ -159,7 +169,8 @@ O Claude renomeia os `data-testid` com frequência, então o adapter lê o texto
 - **Chrome Web Store**: **publicada** — item `jabbichbmfjhbmpijkpinflnijffkgpe` na conta `planoplusdev@gmail.com`, versão **1.1.1 no ar e pública** (publicada em 15/11/2026): https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe — listagem en-US, contato público `contato@dellanio.com`. A versão **1.1.2 (francês + chinês simplificado) está em revisão** desde 15/11/2026 e entra no ar sozinha depois da aprovação. O pacote próprio é `npm run package:chrome` (`minimum_chrome_version: 106`).
 - **Quatro idiomas**: a interface sai em inglês (EUA), português (Brasil), francês e chinês simplificado (`_locales/en`, `pt_BR`, `fr`, `zh_CN`); o idioma segue o do navegador ou pode ser escolhido na tela de configurações. A Chrome Web Store aceita uma listagem por idioma, então as listagens fr e zh-CN estão prontas em `store/CHROME-STORE.md`.
 - As duas lojas usam o mesmo `src/`; só mudam o manifesto e o canal de distribuição. Roteiro e armadilhas: `store/PARTNER-CENTER.md` (Edge) e `store/CHROME-STORE.md` (Chrome).
-- Pendente: o adaptador do Claude ainda não foi validado com conta logada, e o item do Edge tem a **1.1.2 agendada** (a versão com o consentimento de política de dados e as traduções em francês e chinês) para assim que a revisão da 1.1.0 liberar a fila de submissão.
+- Pendente: o item do Edge tem a **1.1.2 agendada** (a versão com o consentimento de política de dados e as traduções em francês e chinês) para assim que a revisão da 1.1.0 liberar a fila de submissão.
+- **Claude validado com conta logada** (15/11/2026, `tests/e2e-claude.mjs`): o adapter lê a última troca montada, extrai o id da conversa da URL, o login OAuth no Mem0 fecha e tanto o botão manual quanto o modo automático gravam as memórias extraídas na conta (log `status: ok`).
 
 ## License
 

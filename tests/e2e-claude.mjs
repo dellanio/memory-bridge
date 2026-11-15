@@ -8,8 +8,17 @@
 //   E2E_HEADFUL=1 node tests/e2e-claude.mjs       # Edge visível (para fazer o login)
 //   CLAUDE_URL=https://claude.ai/chat/<id>       # abre uma conversa específica
 //   CLAUDE_SEND=1                                # envia uma pergunta de teste (cuidado!)
+//   E2E_WINDOW_POSITION=0,0                      # posição da janela headful (2º monitor: -1080,0)
 //
 // Sem sessão logada o teste não falha: ele avisa e sai com código 0 (pulado).
+//
+// IMPORTANTE: o headless NÃO funciona no claude.ai — o Cloudflare responde "Um momento…"
+// e nunca libera a página. Use sempre E2E_HEADFUL=1 (a janela precisa ficar visível;
+// o content script só publica o diagnóstico quando document.hidden === false).
+//
+// Otros auxiliares (mesmo perfil, porta 9337): tests/cdp-eval.mjs (avaliar JS numa aba,
+// abrir a tela de Configurações), tests/save-click.mjs (apertar o botão injetado),
+// tests/claude-send.mjs (enviar mensagem e acompanhar o log da extensão).
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -24,8 +33,15 @@ const URL_ = process.env.CLAUDE_URL || "https://claude.ai/new";
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const first = !existsSync(PROFILE);
 
+// janela headful: fica visível (o Claude/Cloudflare bloqueia headless).
+// E2E_WINDOW_POSITION permite reposicionar, ex.: "0,0" ou "-1080,0" (2º monitor).
+const winPos = process.env.E2E_WINDOW_POSITION || "0,0";
 const edge = spawn(EDGE, [`--user-data-dir=${PROFILE}`, `--remote-debugging-port=${PORT}`,
-  process.env.E2E_HEADFUL ? "--window-position=-2400,0" : "--headless=new",
+  process.env.E2E_HEADFUL ? `--window-position=${winPos}` : "--headless=new",
+  // o content script só publica o diagnóstico quando document.hidden === false:
+  // sem estes flags, uma janela coberta por outra conta como "oculta" e o diag nunca chega.
+  "--disable-backgrounding-occluded-windows", "--disable-renderer-backgrounding",
+  "--disable-background-timer-throttling",
   "--no-first-run", "--no-default-browser-check", "--window-size=1280,900",
   `--disable-extensions-except=${EXT}`, `--load-extension=${EXT}`, URL_], { stdio: "ignore" });
 
@@ -57,7 +73,10 @@ try {
   const page = list.find((t) => t.type === "page" && t.url.includes("claude.ai")) || list.find((t) => t.type === "page");
   const P = cdp(page.webSocketDebuggerUrl);
   await P.send("Page.enable");
-  await sleep(first ? 8000 : 14000);
+  // a aba do Claude precisa estar visível: em segundo plano o content script não publica o diag
+  try { await P.send("Page.bringToFront"); } catch { /* já em foco */ }
+  // headful precisa de mais tempo: o Cloudflare costuma mostrar o "Um momento…" na 1ª carga
+  await sleep(first ? 8000 : (process.env.E2E_HEADFUL ? 30000 : 14000));
 
   const url = await P.evaluate("location.href");
   const loggedIn = await P.evaluate(`(() => {
@@ -80,7 +99,17 @@ try {
   check(host, "botão da extensão injetado no claude.ai");
 
   // diagnóstico: o content script reconheceu o site e leu a última troca
-  const diag = async () => { await sleep(6500); const d = await S.evaluate(`chrome.storage.session.get("diag_claude")`); return (d && d.diag_claude) || { erro: "sem diagnóstico" }; };
+  const diag = async () => {
+    await sleep(6500);
+    let d = await S.evaluate(`chrome.storage.session.get("diag_claude")`);
+    if (!d || !d.diag_claude) {
+      // sem diag: ou a aba ficou oculta, ou o intervalo (a cada 3 ticks de 2 s) ainda não fechou
+      await P.evaluate(`(() => { try { window.dispatchEvent(new Event('focus')); } catch (e) {} return true; })()`);
+      await sleep(3000);
+      d = await S.evaluate(`chrome.storage.session.get("diag_claude")`);
+    }
+    return (d && d.diag_claude) || { erro: "sem diagnóstico" };
+  };
   const d = await diag();
   console.log("  diagnóstico:", JSON.stringify(d));
   check(d && d.site === "claude", "o content script casou com claude.ai");
