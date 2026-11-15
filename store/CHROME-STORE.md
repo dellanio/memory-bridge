@@ -33,6 +33,10 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 - **PUBLICADO**: o item está no ar, público, com a versão **1.1.1**. O painel mostra
   **"Published - public"** e a listagem pública responde com o título, a descrição, as
   capturas e o botão "Add to Chrome".
+- **1.1.2 EM REVISÃO** (enviada em 15/11/2026): acrescenta os idiomas **fr** e **zh_CN** e
+  cria as listagens localizada em francês e em chinês simplificado. Status no painel:
+  **Pending review** (a 1.1.1 continua no ar até a aprovação; a publicação é automática
+  depois dela, porque a opção "publish automatically after review" ficou marcada).
 - Item: **Memory Bridge for Mem0** — ID `jabbichbmfjhbmpijkpinflnijffkgpe`.
 - Listagem pública: https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe
 - Evidência de que está instalável (o endpoint de atualização do Chrome devolve o pacote):
