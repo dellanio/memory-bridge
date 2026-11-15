@@ -8,9 +8,10 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
   para o item poder ser publicado (o painel pede isso em Settings → Profile → "Verify email
   address"; o link chega por e-mail e expira em 1 hora).
 - Pacote: `npm run package:chrome` → `dist/memory-bridge-1.1.1-chrome.zip`
-- Item criado no painel: **Memory Bridge for Mem0**, ID `jabbichbmjfhbmvpjkpinflnjffkgpe`
+- Item criado no painel: **Memory Bridge for Mem0**, ID `jabbichbmfjhbmpijkpinflnijffkgpe`
   (criado no primeiro upload; a 1.1.0 foi o rascunho inicial e a 1.1.1 é a versão com o
   consentimento de política de dados, que o Chrome exige).
+- Listagem pública: https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe
 - Código: **o mesmo** da loja do Edge (`src/`, `icons/`, `_locales/`). A única diferença
   de manifesto é `minimum_chrome_version: "106"` (ver `scripts/package.mjs --chrome`).
 - O item no Chrome é **novo**: extension ID, listagem e fila de revisão próprios.
@@ -26,12 +27,21 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 | `chrome.identity.launchWebAuthFlow` | `src/background.js` (OAuth do Mem0) | 106 |
 | service worker `type: "module"` | `manifest.json` | 91 |
 
-## Estado (12/11/2026)
+## Estado (15/11/2026)
 
-- **Enviado para revisão**: o item está como **Pending review** no painel (1/2 do limite de
-  extensões usado). A opção de publicação automática após a aprovação ficou marcada (padrão
-  do Google): assim que passarem, a extensão vai ao ar sozinha, pública, na listagem en-US.
-- Item: **Memory Bridge for Mem0** — ID `jabbichbmjfhbmvpjkpinflnjffkgpe`.
+- **PUBLICADO**: o item está no ar, público, com a versão **1.1.1**. O painel mostra
+  **"Published - public"** e a listagem pública responde com o título, a descrição, as
+  capturas e o botão "Add to Chrome".
+- Item: **Memory Bridge for Mem0** — ID `jabbichbmfjhbmpijkpinflnijffkgpe`.
+- Listagem pública: https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe
+- Evidência de que está instalável (o endpoint de atualização do Chrome devolve o pacote):
+  `https://clients2.google.com/service/update2/crx?response=redirect&prodversion=130.0&acceptformat=crx2,crx3&x=id%3Djabbichbmfjhbmpijkpinflnijffkgpe%26uc`
+  → **302** para `clients2.googleusercontent.com/crx/blobs/...` → **200**, ~48 KB,
+  arquivo final `..._JABBICHBMFJHBMPIJKPINFLNIJFFKGPE_1_1_1_0.crx` (1.1.1.0).
+- Detalhes públicos que a loja exibe: versão **1.1.1**, atualizado em **12/11/2026**,
+  tamanho 47,27 KiB, 2 idiomas, categoria **Workflow & Planning**, 0 avaliações.
+  O bloco "Privacy" mostra **Authentication information / Personal communications /
+  Website content** e as 3 declarações de uso limitado.
 - Contato público: `contato@dellanio.com` (verificado — o link foi confirmado em 12/11/2026).
 - Pacote no item: **1.1.1** (17 arquivos, `minimum_chrome_version: 106`).
 - Listagem en-US: título e summary vêm do pacote; descrição (1.607 caracteres), categoria
@@ -44,8 +54,19 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 - Distribuição: gratuito, **público**, todas as regiões.
 - Instruções de teste: usuário/senha de uma conta de teste do Mem0 + 439 caracteres de passo
   a passo (inclui marcar o consentimento na tela de opções).
-- **Bloqueio restante:** nenhum — o e-mail de contato foi verificado e o item foi enviado
-  para revisão. Depois da aprovação o Google publica sozinho (opção marcada no diálogo).
+- **Aprovado sem ajustes**: o Google aprovou e publicou sozinho (a opção "publish automatically
+  after review" ficou marcada), entre 12/11 e 15/11/2026.
+
+### Armadilha do ID (erro que já custou tempo)
+
+O extension ID do Chrome é uma string de 32 caracteres; **copiar à mão dá erro fácil** (na
+primeira versão desta ficha o ID estava com letras trocadas — `...bmjhbmvpjk...` em vez de
+`...bmfjhbmpij...`), e o sintoma é enganoso: o endpoint do CRX devolve **404** e a página
+`/detail/<slug>/<id>` redireciona para a home, como se a extensão não existisse. A forma
+segura de pegar o ID é **não digitar**: abrir a listagem pública e ler o `href` do card na
+busca da loja, ou copiar o `..._JABBICH..._1_1_1_0.crx` do endpoint de atualização. Se o
+painel e a busca pública mostrarem o item, mas o CRX der 404, **suspeite do ID, não da
+publicação**.
 
 ## O que o painel já ensinou (armadilhas)
 
@@ -114,7 +135,7 @@ Automatically save what matters from your ChatGPT, Gemini and Claude chats to yo
 ```
 Memory Bridge brings your ChatGPT, Gemini and Claude conversations into your Mem0 account, so your preferences, decisions and important details are available to any assistant connected to Mem0 (Claude, ChatGPT, your own agents and more).
 
-How it works
+HOW IT WORKS
 - A "Save to Mem0" button appears on chatgpt.com, gemini.google.com and claude.ai.
 - Automatic mode: every finished answer is sent to Mem0, which keeps only the relevant facts about you. When there is nothing worth keeping, the button just blinks grey.
 - Manual mode: saves only when you click.
@@ -122,14 +143,20 @@ How it works
 - If the Mem0 sign-in drops, the "Reconnect" button redoes the authorization in one click.
 - Interface in English (US) and Portuguese (Brazil).
 
-Your account, your data
+YOUR ACCOUNT, YOUR DATA
+- The Settings screen opens with a plain-language data policy. Nothing leaves your browser until you tick the consent box and save, and unticking it stops the extension from sending anything.
 - Sign in with your Mem0 account (official Mem0 OAuth) or use an API key - straight to the REST API or to Mem0's own MCP server.
 - You choose the User ID memories are saved under and the app_id for each site.
 - API keys, tokens and card numbers that show up in a chat are hidden before sending.
-- Everything goes straight from your browser to Mem0. No middle server, no tracking, no ads.
+- Everything goes straight from your browser to Mem0. No middle server, no tracking, no ads. The developer never receives your data.
 
 Requires a Mem0 account (https://mem0.ai). Independent project, not officially affiliated with Mem0, OpenAI, Google or Anthropic.
 ```
+
+> Esse é o texto **exatamente como está no ar** (verificado na listagem pública em
+> 15/11/2026): cabeçalho em maiúsculas e a frase do consentimento como primeiro bullet de
+> "Your account, your data". O bloco pt-BR abaixo é o texto alternativo, para quando a
+> listagem for trocada de idioma.
 
 ### Português (Brasil) (pt-BR)
 
@@ -233,8 +260,9 @@ No remote code is loaded; all code is in the package.
   Publish API (v1.1, usada pelo `chrome-webstore-upload-cli`) só atualiza itens já existentes
   e exige credenciais OAuth do Google Cloud + refresh token. Para a primeira publicação, o
   upload é pelo painel.
-- **A primeira revisão é a mais demorada**: item novo costuma levar bem mais que 7 dias úteis
-  (o Edge é mais rápido). O status fica em "In review" no painel.
+- **A primeira revisão levou ~3 dias** (enviado em 12/11/2026, publicado em 15/11/2026) —
+  bem menos que o "semanas" que o painel avisa, mas conte com variability: item novo pode
+  levar bem mais que 7 dias úteis (o Edge é mais rápido). O status fica em "In review" no painel.
 - **"Publish" é bloqueado** enquanto houver uma versão em revisão.
 - O `dist/memory-bridge-1.1.0-chrome.zip` **não** vai para o Edge e o
   `dist/memory-bridge-1.1.0.zip` **não** vai para o Chrome: cada loja recebe o seu zip.
