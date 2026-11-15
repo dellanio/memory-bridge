@@ -72,6 +72,8 @@ O **rascunho da listagem (descrição, tiles, capturas) viaja junto da submissã
 
 > Histórico: 1.0.2 publicada em 07/10/2026 pela tela. 1.0.3 publicada em 11/11/2026 pela API (upload e publicação `succeeded`); revisão cancelada em 12/11/2026 para liberar a fila. 1.1.0 (Claude) publicada em 12/11/2026 pela API — upload e publicação `succeeded`, status "In review". **1.1.2 (consentimento de política de dados + francês e chinês) agendada** para quando a revisão da 1.1.0 liberar a fila — ver "Publicação da 1.1.2" abaixo.
 
+> **Status verificado no Partner Center em 15/11/2026**: 1.1.0 segue **"In review"**, com o aviso da Microsoft *"Microsoft is reviewing your submission currently. Expect to hear back from us in **7 business days**"* (submetida em 12/11/2026 → previsão em torno de **23/11/2026**). A 1.0.2 está **"Live"**.Ou seja: publicar a 1.1.2 agora devolveria `InProgressSubmission`.
+
 ## Etapa 4 — Disponibilidade (Availability)
 
 - Visibility: **Public**
