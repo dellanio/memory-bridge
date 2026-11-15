@@ -40,6 +40,17 @@ Dados desta extensão:
 | CRX ID | `hajblgdoncpkaojaklgpmndibhdoaice` |
 | Client ID (Publish API) | `7733d7a4-f45c-4a11-8800-bf498221f3b4` |
 
+**URL pública da listagem** (é o **CRX ID** no caminho, não o Store ID):
+
+```
+https://microsoftedge.microsoft.com/addons/detail/memory-bridge-para-mem0/hajblgdoncpkaojaklgpmndibhdoaice
+```
+
+> Armadilha: `.../edgewebstore/extension/0RDCKB8HRMN4/...` (Store ID no lugar do CRX ID)
+> **redireciona para a home** e o `Invoke-WebRequest` devolve **200** da home — parece que a
+> listagem está no ar quando não está. O mesmo vale para o `?pli=1`. Para conferir a versão
+> pública, abra a URL com o CRX ID e leia "Versão X.Y.Z" no rodapé da página.
+
 1. Partner Center → **Microsoft Edge** → **Publish API** (`partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi`) → **Turn on API**. O botão liga a API e **cria as credenciais na hora** (Client ID + API key). **A chave só é exibida nessa sessão** ("It won't be available for copy in your next session") — copie na hora.
 2. As credenciais ficam em `store/edge-credentials.local.json` (no `.gitignore`, nunca vai para o git). O script lê esse arquivo; variáveis de ambiente (`EDGE_PRODUCT_ID`, `EDGE_CLIENT_ID`, `EDGE_API_KEY`) têm precedência.
 3. Na pasta do projeto:
