@@ -1,0 +1,236 @@
+{
+  "extName": {
+    "message": "Memory Bridge for Mem0"
+  },
+  "extDesc": {
+    "message": "Enregistrez automatiquement l’essentiel de vos conversations ChatGPT, Gemini et Claude dans votre propre compte Mem0."
+  },
+  "btnSave": {
+    "message": "Enregistrer dans Mem0"
+  },
+  "btnSaving": {
+    "message": "Enregistrement…"
+  },
+  "btnSaved": {
+    "message": "Enregistré ✓"
+  },
+  "btnAlready": {
+    "message": "Déjà enregistré ✓"
+  },
+  "btnError": {
+    "message": "Erreur — voir l’icône dans la barre d’outils"
+  },
+  "btnNothing": {
+    "message": "Rien à enregistrer — utilisez Diagnostic"
+  },
+  "tipAuto": {
+    "message": "Le mode automatique est activé"
+  },
+  "tipManual": {
+    "message": "Cliquez pour enregistrer le dernier échange"
+  },
+  "optTitle": {
+    "message": "Paramètres"
+  },
+  "secAccount": {
+    "message": "Compte Mem0"
+  },
+  "authOauth": {
+    "message": "Se connecter avec Mem0 (OAuth, recommandé)"
+  },
+  "authApikey": {
+    "message": "Clé d’API (avancé)"
+  },
+  "authApikeyMcp": {
+    "message": "Clé d’API sur le serveur MCP (sans OAuth — fonctionne même si l’enregistrement des clients Mem0 est indisponible)"
+  },
+  "connect": {
+    "message": "Se connecter"
+  },
+  "disconnect": {
+    "message": "Se déconnecter"
+  },
+  "test": {
+    "message": "Tester la connexion"
+  },
+  "connected": {
+    "message": "Connecté"
+  },
+  "notConnected": {
+    "message": "Non connecté"
+  },
+  "apiKeyLabel": {
+    "message": "Clé d’API Mem0 (stockée uniquement dans ce navigateur)"
+  },
+  "secUser": {
+    "message": "Votre identité dans Mem0"
+  },
+  "userIdLabel": {
+    "message": "User ID (obligatoire) — les mémoires sont enregistrées sous cet user_id"
+  },
+  "secCapture": {
+    "message": "Capture"
+  },
+  "modeManual": {
+    "message": "Manuel — uniquement quand je clique sur « Enregistrer dans Mem0 »"
+  },
+  "modeAuto": {
+    "message": "Automatique — enregistrer chaque réponse terminée"
+  },
+  "sitesLabel": {
+    "message": "Sites et app_id"
+  },
+  "redactLabel": {
+    "message": "Masquer les secrets évidents (clés d’API, jetons, numéros de carte) avant l’envoi"
+  },
+  "save": {
+    "message": "Enregistrer"
+  },
+  "saved": {
+    "message": "Enregistré."
+  },
+  "privacy": {
+    "message": "Ce qui est envoyé : uniquement la question et la réponse que vous enregistrez, plus le site, l’identifiant de conversation et l’URL, directement vers Mem0. Rien n’est envoyé ailleurs."
+  },
+  "popEnabled": {
+    "message": "Activé"
+  },
+  "popRecent": {
+    "message": "Activité récente"
+  },
+  "popEmpty": {
+    "message": "Rien d’envoyé pour l’instant."
+  },
+  "popOptions": {
+    "message": "Paramètres"
+  },
+  "popReconnect": {
+    "message": "Reconnecter"
+  },
+  "popClear": {
+    "message": "Effacer"
+  },
+  "needUser": {
+    "message": "Définissez votre User ID dans les Paramètres."
+  },
+  "optHeading": {
+    "message": "Intégration Mem0"
+  },
+  "optWaiting": {
+    "message": "Veuillez patienter… Ouverture de Mem0"
+  },
+  "secAccountDesc": {
+    "message": "Comment l’extension dialogue avec votre compte Mem0."
+  },
+  "secUserDesc": {
+    "message": "Chaque mémoire est enregistrée sous cet utilisateur. Utilisez le même identifiant que dans vos autres intégrations Mem0 pour tout regrouper."
+  },
+  "secCaptureDesc": {
+    "message": "Choisissez quand les conversations sont enregistrées et sur quels sites. L’app_id identifie la source dans Mem0."
+  },
+  "popDiag": {
+    "message": "Diagnostiquer cet onglet"
+  },
+  "diagNoTab": {
+    "message": "L’extension n’est pas active dans cet onglet. Ouvrez chatgpt.com, gemini.google.com ou claude.ai dans Edge et rechargez la page."
+  },
+  "secFilter": {
+    "message": "Filtre de mémoires"
+  },
+  "secFilterDesc": {
+    "message": "Instructions envoyées avec chaque conversation pour indiquer à Mem0 ce qui vaut la peine d’être retenu. Laissez vide pour laisser Mem0 décider seul."
+  },
+  "restoreDefault": {
+    "message": "Rétablir la valeur par défaut"
+  },
+  "defaultInstructions": {
+    "message": "N’extrais que des faits durables concernant l’utilisateur : préférences, opinions, détails personnels et professionnels, projets, décisions, objectifs et contexte de vie. Ignore les calculs, les salutations, les questions ponctuelles, les généralités, le contenu générique des réponses de l’assistant et tout fait qui ne concerne pas l’utilisateur. Quand l’utilisateur change une préférence ou une décision, enregistre la nouvelle en précisant qu’elle remplace la précédente."
+  },
+  "tipNothing": {
+    "message": "Mem0 n’a rien trouvé à retenir dans cette conversation"
+  },
+  "btnPending": {
+    "message": "Envoyé — Mem0 traite encore"
+  },
+  "logNothing": {
+    "message": "rien à conserver"
+  },
+  "langAuto": {
+    "message": "Automatique (langue du navigateur)"
+  },
+  "logConnected": {
+    "message": "Connecté à Mem0 (OAuth)"
+  },
+  "errLoginRefused": {
+    "message": "Connexion refusée : $1"
+  },
+  "errLoginInvalid": {
+    "message": "Connexion invalide (état incohérent). Réessayez."
+  },
+  "errNotConnected": {
+    "message": "Non connecté à Mem0 : ouvrez les Paramètres et cliquez sur Se connecter"
+  },
+  "errSessionExpired": {
+    "message": "Session Mem0 expirée : reconnectez-vous"
+  },
+  "errUnauthorized": {
+    "message": "Mem0 a refusé la connexion : reconnectez-vous"
+  },
+  "errClientInvalid": {
+    "message": "Mem0 ne reconnaît plus la connexion de cette extension (l’enregistrement du client a été supprimé côté serveur). Ouvrez les Paramètres et cliquez sur Se connecter pour enregistrer un nouveau client."
+  },
+  "errDcrUnavailable": {
+    "message": "Le serveur Mem0 refuse les nouveaux enregistrements de client (HTTP $1). Utilisez une clé d’API (MCP ou REST) dans les Paramètres en attendant."
+  },
+  "errNoApiKey": {
+    "message": "Clé d’API non définie"
+  },
+  "errNeedUserLog": {
+    "message": "Définissez votre User ID dans les Paramètres"
+  },
+  "errKeyRefused": {
+    "message": "Clé d’API refusée"
+  },
+  "testKeyOk": {
+    "message": "La clé d’API est valide."
+  },
+  "testMcpOk": {
+    "message": "Connecté : $1 outils Mem0 disponibles."
+  },
+  "errGeneric": {
+    "message": "erreur"
+  },
+  "userIdPlaceholder": {
+    "message": "ex. maria"
+  },
+  "consentHeading": {
+    "message": "Avant de commencer : ce que cette extension fait de vos données"
+  },
+  "consentDesc": {
+    "message": "Cette extension lit la dernière question et la dernière réponse de la conversation ouverte sur chatgpt.com, gemini.google.com et claude.ai, et envoie ce que vous choisissez à VOTRE compte Mem0."
+  },
+  "consentItem1": {
+    "message": "Le développeur ne reçoit jamais vos données : tout va directement de votre navigateur vers votre propre compte Mem0."
+  },
+  "consentItem2": {
+    "message": "La clé d’API ou le jeton d’accès que vous autorisez reste uniquement dans votre navigateur (chrome.storage.local)."
+  },
+  "consentItem3": {
+    "message": "Aucune donnée n’est utilisée pour la publicité, l’analyse d’audience ou le partage avec des tiers, au-delà du service Mem0 que vous avez choisi."
+  },
+  "consentAccept": {
+    "message": "J’ai lu et j’accepte : la dernière question et la dernière réponse peuvent être envoyées à mon compte Mem0, et rien n’est envoyé au développeur."
+  },
+  "consentRequired": {
+    "message": "Vous devez accepter ci-dessus avant de vous connecter et d’enregistrer des conversations."
+  },
+  "consentNeed": {
+    "message": "Acceptez la politique de données dans les paramètres pour envoyer vers Mem0."
+  },
+  "consentOff": {
+    "message": "Sans consentement, rien n’est envoyé à Mem0."
+  },
+  "consentPolicy": {
+    "message": "Politique de confidentialité complète"
+  }
+}

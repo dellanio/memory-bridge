@@ -147,17 +147,19 @@ O Claude renomeia os `data-testid` com frequência, então o adapter lê o texto
 
 ## Publication (Edge Add-ons and Chrome Web Store)
 
-- **Edge Add-ons**: public listing live with **1.0.2** (https://microsoftedge.microsoft.com/addons/detail/memory-bridge-para-mem0/hajblgdoncpkaojaklgpmndibhdoaice); **1.1.0** (adds the Claude adapter) is under review and 1.1.1 (data-policy consent) is queued behind it. Store ID `0RDCKB8HRMN4`.
+- **Edge Add-ons**: public listing live with **1.0.2** (https://microsoftedge.microsoft.com/addons/detail/memory-bridge-para-mem0/hajblgdoncpkaojaklgpmndibhdoaice); **1.1.0** (adds the Claude adapter) is under review and **1.1.2** (data-policy consent + French + Simplified Chinese) is queued behind it. Store ID `0RDCKB8HRMN4`.
 - **Chrome Web Store**: **published** — item `jabbichbmfjhbmpijkpinflnijffkgpe` on account `planoplusdev@gmail.com`, version **1.1.1 live and public** (published 15/11/2026): https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe — en-US listing, public contact `contato@dellanio.com`. Its own package is `npm run package:chrome` (`minimum_chrome_version: 106`).
+- **Four languages**: the interface ships in English (US), Portuguese (Brazil), French and Simplified Chinese (`_locales/en`, `pt_BR`, `fr`, `zh_CN`); the language follows the browser or can be set in the settings page. The Chrome Web Store accepts one listing per language, so the fr and zh-CN listings are prepared in `store/CHROME-STORE.md`.
 - Both stores share the same `src/`; only the manifest and the distribution channel differ. Route and pitfalls: `store/PARTNER-CENTER.md` (Edge) and `store/CHROME-STORE.md` (Chrome).
-- Still pending: the Claude adapter has not been validated with a signed-in account, and the Edge item is scheduled to get 1.1.1 (the version with the data-policy consent) as soon as the 1.1.0 review frees the submission queue.
+- Still pending: the Claude adapter has not been validated with a signed-in account, and the Edge item is scheduled to get 1.1.2 (the version with the data-policy consent and the French/Chinese translations) as soon as the 1.1.0 review frees the submission queue.
 
 ## Publicação (Edge Add-ons e Chrome Web Store)
 
-- **Edge Add-ons**: listagem pública no ar com a **1.0.2** (https://microsoftedge.microsoft.com/addons/detail/memory-bridge-para-mem0/hajblgdoncpkaojaklgpmndibhdoaice); a **1.1.0** (com o adaptador do Claude) está em revisão e a 1.1.1 (consentimento de política de dados) está na fila atrás dela. Store ID `0RDCKB8HRMN4`.
+- **Edge Add-ons**: listagem pública no ar com a **1.0.2** (https://microsoftedge.microsoft.com/addons/detail/memory-bridge-para-mem0/hajblgdoncpkaojaklgpmndibhdoaice); a **1.1.0** (com o adaptador do Claude) está em revisão e a **1.1.2** (consentimento de política de dados + francês e chinês) está na fila atrás dela. Store ID `0RDCKB8HRMN4`.
 - **Chrome Web Store**: **publicada** — item `jabbichbmfjhbmpijkpinflnijffkgpe` na conta `planoplusdev@gmail.com`, versão **1.1.1 no ar e pública** (publicada em 15/11/2026): https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe — listagem en-US, contato público `contato@dellanio.com`. O pacote próprio é `npm run package:chrome` (`minimum_chrome_version: 106`).
+- **Quatro idiomas**: a interface sai em inglês (EUA), português (Brasil), francês e chinês simplificado (`_locales/en`, `pt_BR`, `fr`, `zh_CN`); o idioma segue o do navegador ou pode ser escolhido na tela de configurações. A Chrome Web Store aceita uma listagem por idioma, então as listagens fr e zh-CN estão prontas em `store/CHROME-STORE.md`.
 - As duas lojas usam o mesmo `src/`; só mudam o manifesto e o canal de distribuição. Roteiro e armadilhas: `store/PARTNER-CENTER.md` (Edge) e `store/CHROME-STORE.md` (Chrome).
-- Pendente: o adaptador do Claude ainda não foi validado com conta logada, e o item do Edge tem a **1.1.1 agendada** (a versão com o consentimento de política de dados) para assim que a revisão da 1.1.0 liberar a fila de submissão.
+- Pendente: o adaptador do Claude ainda não foi validado com conta logada, e o item do Edge tem a **1.1.2 agendada** (a versão com o consentimento de política de dados e as traduções em francês e chinês) para assim que a revisão da 1.1.0 liberar a fila de submissão.
 
 ## License
 

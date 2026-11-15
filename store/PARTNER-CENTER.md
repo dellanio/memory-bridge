@@ -13,7 +13,7 @@ Arquivos (pasta `D:\projetos-pessoal\mem0-edge\`):
 
 - Protótipo funcionando: ✔
 - Conta de desenvolvedor: **sua parte** (Partner Center → Programas → Microsoft Edge → Introdução, conta **Individual**).
-- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.1.1.zip` (Edge) e `dist\memory-bridge-1.1.1-chrome.zip` (Chrome)
+- `.zip` com o `manifest.json` na raiz: ✔ `dist\memory-bridge-1.1.2.zip` (Edge) e `dist\memory-bridge-1.1.2-chrome.zip` (Chrome)
 - Campos do manifest que viram texto da loja (não editáveis no Partner Center):
   - Nome: "Memory Bridge for Mem0" / "Memory Bridge para Mem0"
   - Descrição curta: "Automatically save what matters from your ChatGPT, Gemini and Claude chats to your own Mem0 account." / "Salve automaticamente o que importa das suas conversas do ChatGPT, Gemini e Claude na sua própria conta Mem0."
@@ -24,8 +24,8 @@ Partner Center → **Página inicial** → cartão **Edge** → **Create new ext
 
 ## Etapa 3 — Enviar o pacote
 
-Arraste `dist\memory-bridge-1.1.1.zip` → aguarde a validação → **Continue**.
-O Partner Center deve listar **dois idiomas** (en e pt_BR). Se aparecer só um, ver "If a single locale appears" na página da Microsoft.
+Arraste `dist\memory-bridge-1.1.2.zip` → aguarde a validação → **Continue**.
+O Partner Center deve listar **quatro idiomas** (en, pt_BR, fr, zh_CN). Se aparecer só um, ver "If a single locale appears" na página da Microsoft.
 
 ### Atalho: publicar pela API oficial (sem Partner Center)
 
@@ -68,7 +68,7 @@ O script empacota, envia o `.zip` para o rascunho (`POST /v1/products/$productID
 
 O **rascunho da listagem (descrição, tiles, capturas) viaja junto da submissão do pacote**: depois de publicar, o botão "Publish" da tela "Store listings" responde *"Can't publish extension as your extension has not been modified since last push"* — sinal de que o metadado novo já foi para a revisão. Ele não é publicado sozinho.
 
-> Histórico: 1.0.2 publicada em 07/10/2026 pela tela. 1.0.3 publicada em 11/11/2026 pela API (upload e publicação `succeeded`); revisão cancelada em 12/11/2026 para liberar a fila. 1.1.0 (Claude) publicada em 12/11/2026 pela API — upload e publicação `succeeded`, status "In review". **1.1.1 (consentimento de política de dados) agendada** para quando a revisão da 1.1.0 liberar a fila — ver "Publicação da 1.1.1" abaixo.
+> Histórico: 1.0.2 publicada em 07/10/2026 pela tela. 1.0.3 publicada em 11/11/2026 pela API (upload e publicação `succeeded`); revisão cancelada em 12/11/2026 para liberar a fila. 1.1.0 (Claude) publicada em 12/11/2026 pela API — upload e publicação `succeeded`, status "In review". **1.1.2 (consentimento de política de dados + francês e chinês) agendada** para quando a revisão da 1.1.0 liberar a fila — ver "Publicação da 1.1.2" abaixo.
 
 ## Etapa 4 — Disponibilidade (Availability)
 
@@ -186,7 +186,8 @@ Não use o botão "Generate with AI": a descrição pronta já foi revisada.
 
 **Publish** (canto superior direito) → cole em **Notes for certification**:
 
-> Texto da **1.1.1** (o da 1.1.0 é o mesmo sem o passo 1 do aceite). Leia o bloco completo em
+> Texto da **1.1.2** (o da 1.1.1 é o mesmo sem o passo 1 do aceite; o da 1.1.0 é o mesmo sem o
+> passo 1 e sem a frase de consentimento). Leia o bloco completo em
 > `store/LISTING.md` → "Notas para a certificação".
 
 ```
@@ -201,7 +202,7 @@ The extension needs a free Mem0 account (https://app.mem0.ai) to be tested. No o
 7. The same works on https://gemini.google.com (requires a Google account).
 8. The same "Save to Mem0" button is injected on https://claude.ai — open any conversation there (a free Anthropic account is required to chat) and the button appears at the bottom right, saving the last exchange in the same way. The settings page shows a separate "Claude" site with its own app_id (claude).
 
-The interface is available in English (US) and Portuguese (Brazil); the language can be changed at the top of the settings page.
+The interface is available in English (US), Portuguese (Brazil), French and Simplified Chinese; the language can be changed at the top of the settings page (it also follows the browser language by default).
 No remote code is used. The only servers contacted are mcp.mem0.ai and api.mem0.ai. Source code: https://github.com/dellanio/memory-bridge
 ```
 
@@ -209,26 +210,27 @@ No remote code is used. The only servers contacted are mcp.mem0.ai and api.mem0.
 
 ---
 
-## Publicação da 1.1.1 (consentimento de política de dados) — fazer quando a fila liberar
+## Publicação da 1.1.2 (consentimento de política de dados + francês e chinês) — fazer quando a fila liberar
 
-A **1.1.1** já está pronta no repositório (o pacote é o mesmo `src/` da 1.1.0 mais o bloco de
-consentimento). Ela está **agendada** para quando a revisão da 1.1.0 terminar, porque a API do
-Edge Add-ons só publica quando **não há submissão em revisão** (`InProgressSubmission`).
+A **1.1.2** já está pronta no repositório (o mesmo `src/` da 1.1.0 mais o bloco de
+consentimento e mais dois idiomas: **fr** e **zh_CN**). Ela está **agendada** para quando a
+revisão da 1.1.0 terminar, porque a API do Edge Add-ons só publica quando **não há submissão
+em revisão** (`InProgressSubmission`).
 
 **Por que esperar**: a 1.1.0 em revisão é aceitável (a Edge Add-ons não exige consentimento na
 interface) e a política de privacidade publicada cobre as duas versões. Se a fila liberar e
-você quiser a 1.1.1 no ar antes, dá para **cancelar a revisão da 1.1.0** (Extension overview →
+você quiser a 1.1.2 no ar antes, dá para **cancelar a revisão da 1.1.0** (Extension overview →
 Cancel submission, leva 5–10 min) e publicar na hora — isso troca ~7 dias úteis de espera por
-~7 dias de nova revisão da 1.1.1, sem mudar o resultado final.
+~7 dias de nova revisão da 1.1.2, sem mudar o resultado final.
 
 **Checklist do momento da publicação**
 
-1. `npm run package` → `dist\memory-bridge-1.1.1.zip` (alvo Edge, sem `minimum_chrome_version`).
+1. `npm run package` → `dist\memory-bridge-1.1.2.zip` (alvo Edge, sem `minimum_chrome_version`).
 2. Conferir a fila: Extension overview → se ainda houver "In review", **pare** (ou cancele, se
    a decisão for antecipares).
 3. Atualizar a **listagem** (Store listings) — o rascunho viaja junto da submissão do pacote:
-   - descrição curta e descrição (en e pt): os textos novos com a frase do consentimento estão
-     em `store/LISTING.md`;
+   - descrição curta e descrição nos **quatro** idiomas (en, pt, fr, zh_CN): os textos novos com
+     a frase do consentimento estão em `store/LISTING.md`;
    - capturas: trocar a captura de opções pela nova (`store\screenshot-1-options-en.png` /
      `-pt.png`, 1280×800, agora com o bloco de consentimento) — excluir a antiga e enviar a nova;
    - tiles 440×280 e 1400×560: podem ser reaproveitados (o texto não mudou).
@@ -236,15 +238,15 @@ Cancel submission, leva 5–10 min) e publicar na hora — isso troca ~7 dias ú
 
 ```
 npm run publish:edge -- --dry-run
-npm run publish:edge -- --yes --notes "<bloco de notas da 1.1.1 acima, em uma linha por parágrafo>"
+npm run publish:edge -- --yes --notes "<bloco de notas da 1.1.2 acima, em uma linha por parágrafo>"
 ```
 
 5. Conferir o resultado: `upload ... succeeded` **e** `publish ... succeeded`; o Partner Center
-   passa a mostrar "UPDATE - Memory Bridge for Mem0 Version 1.1.1 · In review".
+   passa a mostrar "UPDATE - Memory Bridge for Mem0 Version 1.1.2 · In review".
 6. Se aparecer `InProgressSubmission`, o pacote fica no rascunho: rodar `--yes` de novo quando
    a fila liberar (o script detecta e sai com código 1, sem anunciar sucesso falso).
 
-**Declarações de dados**: as do Edge Add-ons não mudam para a 1.1.1 — o destino continua sendo a
+**Declarações de dados**: as do Edge Add-ons não mudam para a 1.1.2 — o destino continua sendo a
 conta Mem0 do próprio usuário. Se o painel perguntar de novo, manter as respostas atuais e
 acrescentar que o envio só ocorre após o aceite na tela de configurações da extensão.
 

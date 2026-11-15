@@ -8,6 +8,32 @@ import { join, resolve } from "node:path";
 const ROOT = resolve(import.meta.dirname, "..");
 const OUT = join(ROOT, "store");
 const LANG = process.argv[2] || "pt-BR";
+// idioma -> sufixo dos arquivos, idioma da extensão, textos do bloco promocional e memórias de exemplo
+const LANGS = {
+  "pt-BR": { suffix: "pt", lang: "pt_BR",
+    tag: "Suas conversas do ChatGPT, do Gemini e do Claude viram memória no Mem0", sub: "Integração com Mem0",
+    sample: ["Usuário torce para o Palmeiras", "Comida favorita do usuário é baião de dois", "Usuário trabalha como arquiteto de software", "Usuário prefere respostas curtas e diretas"],
+    q: "Quanto é 12 vezes 12?", claude: "Usuário usa Claude para revisar código" },
+  "en-US": { suffix: "en", lang: "en",
+    tag: "Turn your ChatGPT, Gemini and Claude chats into Mem0 memories", sub: "Mem0 Integration",
+    sample: ["User supports Palmeiras football club", "User's favorite food is baião de dois", "User works as a software architect", "User prefers short, direct answers"],
+    q: "What is 12 times 12?", claude: "User uses Claude to review code" },
+  fr: { suffix: "fr", lang: "fr",
+    tag: "Vos conversations ChatGPT, Gemini et Claude deviennent des mémoires Mem0", sub: "Intégration Mem0",
+    sample: ["L’utilisateur supporte le club de football Palmeiras", "La nourriture préférée de l’utilisateur est le baião de dois", "L’utilisateur travaille comme architecte logiciel", "L’utilisateur préfère des réponses courtes et directes"],
+    q: "Combien font 12 fois 12 ?", claude: "L’utilisateur utilise Claude pour relire du code" },
+  "zh-CN": { suffix: "zh", lang: "zh_CN",
+    tag: "让 ChatGPT、Gemini 和 Claude 的对话成为 Mem0 记忆", sub: "Mem0 集成",
+    sample: ["用户支持帕尔梅拉斯足球俱乐部", "用户最喜欢的食物是 baião de dois", "用户是一名软件架构师", "用户偏好简短直接的回答"],
+    q: "12 乘 12 等于多少？", claude: "用户用 Claude 审阅代码" },
+};
+const CONF = LANGS[LANG];
+if (!CONF) {
+  console.error(`idioma desconhecido: ${LANG} (use um de: ${Object.keys(LANGS).join(", ")})`);
+  process.exit(1);
+}
+const suffix = CONF.suffix;
+const T = { tag: CONF.tag, sub: CONF.sub };
 mkdirSync(OUT, { recursive: true });
 const svg = readFileSync(join(ROOT, "icons", "icon.svg"), "utf8");
 const PORT = 9337, sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -24,10 +50,7 @@ function cdp(url) {
   const ev = async (x) => (await call("Runtime.evaluate", { expression: x, awaitPromise: true, returnByValue: true })).result?.result?.value;
   return { call, ev, close: () => ws.close() };
 }
-const suffix = LANG.startsWith("pt") ? "pt" : "en";
-const T = suffix === "pt"
-  ? { tag: "Suas conversas do ChatGPT, do Gemini e do Claude viram memória no Mem0", sub: "Integração com Mem0" }
-  : { tag: "Turn your ChatGPT, Gemini and Claude chats into Mem0 memories", sub: "Mem0 Integration" };
+
 
 try {
   let sw;
@@ -35,18 +58,16 @@ try {
   const id = new URL(sw.url).host;
   const S = cdp(sw.webSocketDebuggerUrl);
   const now = Date.now();
-  const sample = suffix === "pt"
-    ? ["Usuário torce para o Palmeiras", "Comida favorita do usuário é baião de dois", "Usuário trabalha como arquiteto de software", "Usuário prefere respostas curtas e diretas"]
-    : ["User supports Palmeiras football club", "User's favorite food is baião de dois", "User works as a software architect", "User prefers short, direct answers"];
+  const sample = CONF.sample;
   const log = [
     { at: new Date(now - 60e3).toISOString(), status: "ok", site: "chatgpt", preview: sample[3] },
-    { at: new Date(now - 6e5).toISOString(), status: "none", site: "gemini", preview: suffix === "pt" ? "Quanto é 12 vezes 12?" : "What is 12 times 12?" },
+    { at: new Date(now - 6e5).toISOString(), status: "none", site: "gemini", preview: CONF.q },
     { at: new Date(now - 9e5).toISOString(), status: "ok", site: "gemini", preview: sample[1] },
-    { at: new Date(now - 3e5).toISOString(), status: "ok", site: "claude", preview: suffix === "pt" ? "Usuário usa Claude para revisar código" : "User uses Claude to review code" },
+    { at: new Date(now - 3e5).toISOString(), status: "ok", site: "claude", preview: CONF.claude },
     { at: new Date(now - 2e6).toISOString(), status: "ok", site: "chatgpt", preview: sample[2] },
     { at: new Date(now - 4e6).toISOString(), status: "ok", site: "gemini", preview: sample[0] },
   ];
-  await S.ev(`chrome.storage.local.set({ settings: { userId: "maria", mode: "auto", authMode: "oauth" },
+  await S.ev(`chrome.storage.local.set({ settings: { userId: "maria", mode: "auto", authMode: "oauth", language: ${JSON.stringify(CONF.lang)} },
     auth: { clientId: "demo", accessToken: "demo", expiresAt: ${now + 36e5} }, log: ${JSON.stringify(log)} })`);
   await sleep(500);
 

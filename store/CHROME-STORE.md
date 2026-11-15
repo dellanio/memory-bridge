@@ -7,10 +7,11 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
 - E-mail de contato (público no item): **contato@dellanio.com** — precisa estar verificado
   para o item poder ser publicado (o painel pede isso em Settings → Profile → "Verify email
   address"; o link chega por e-mail e expira em 1 hora).
-- Pacote: `npm run package:chrome` → `dist/memory-bridge-1.1.1-chrome.zip`
+- Pacote: `npm run package:chrome` → `dist/memory-bridge-1.1.2-chrome.zip`
+  (no ar: 1.1.1, com consentimento; 1.1.2 acrescenta os idiomas **fr** e **zh_CN**)
 - Item criado no painel: **Memory Bridge for Mem0**, ID `jabbichbmfjhbmpijkpinflnijffkgpe`
-  (criado no primeiro upload; a 1.1.0 foi o rascunho inicial e a 1.1.1 é a versão com o
-  consentimento de política de dados, que o Chrome exige).
+  (criado no primeiro upload; a 1.1.0 foi o rascunho inicial, a 1.1.1 é a versão publicada com o
+  consentimento de política de dados, e a 1.1.2 acrescenta os idiomas).
 - Listagem pública: https://chromewebstore.google.com/detail/memory-bridge-for-mem0/jabbichbmfjhbmpijkpinflnijffkgpe
 - Código: **o mesmo** da loja do Edge (`src/`, `icons/`, `_locales/`). A única diferença
   de manifesto é `minimum_chrome_version: "106"` (ver `scripts/package.mjs --chrome`).
@@ -43,7 +44,10 @@ Roteiro campo a campo para o Painel de controle do desenvolvedor da Chrome Web S
   O bloco "Privacy" mostra **Authentication information / Personal communications /
   Website content** e as 3 declarações de uso limitado.
 - Contato público: `contato@dellanio.com` (verificado — o link foi confirmado em 12/11/2026).
-- Pacote no item: **1.1.1** (17 arquivos, `minimum_chrome_version: 106`).
+- Pacote no ar: **1.1.1** (17 arquivos, `minimum_chrome_version: 106`).
+- **Próxima versão preparada: 1.1.2** (19 arquivos — os mesmos + `_locales/fr` e
+  `_locales/zh_CN`) → `dist/memory-bridge-1.1.2-chrome.zip`. Ela traz os quatro idiomas
+  (en, pt_BR, fr, zh_CN) e precisa de uma nova revisão do Google para entrar no ar.
 - Listagem en-US: título e summary vêm do pacote; descrição (1.607 caracteres), categoria
   **Workflow & Planning**, ícone 128×128 (sem alfa), 2 capturas 1280×800 (localizadas e
   globais), tiles 440×280 e 1400×560, homepage `dellanio.com`, suporte
@@ -177,16 +181,115 @@ Como funciona
 - Modo manual: só salva quando você clica.
 - Filtro de memórias editável: diga ao Mem0 o que vale lembrar e o que ignorar (por padrão, ignora cálculos, saudações e perguntas pontuais).
 - Se o login do Mem0 cair, o botão "Reconectar" refaz a autorização em um clique.
-- Interface em português (Brasil) e inglês (EUA).
+- Interface em português (Brasil), inglês (EUA), francês e chinês simplificado.
 
 Sua conta, seus dados
+- A tela de Configurações abre com a política de dados em linguagem simples: nada sai do seu navegador até você marcar a caixa de aceite e salvar, e desmarcar faz a extensão parar de enviar.
 - Entre com a sua conta Mem0 (OAuth oficial do Mem0) ou use uma chave de API - direto na API REST ou no próprio servidor MCP do Mem0.
 - Você escolhe o User ID com que as memórias são gravadas e o app_id de cada site.
 - Chaves de API, tokens e números de cartão que aparecerem na conversa são ocultados antes do envio.
-- Tudo vai direto do seu navegador para o Mem0. Não há servidor intermediário, rastreamento nem anúncios.
+- Tudo vai direto do seu navegador para o Mem0. Não há servidor intermediário, rastreamento nem anúncios. O desenvolvedor nunca recebe os seus dados.
 
 Requer uma conta Mem0 (https://mem0.ai). Projeto independente, sem vínculo oficial com a Mem0, a OpenAI, o Google ou a Anthropic.
 ```
+
+### Français (fr)
+
+**Summary (≤132 caracteres)**
+
+```
+Enregistrez automatiquement l’essentiel de vos conversations ChatGPT, Gemini et Claude dans votre propre compte Mem0.
+```
+
+**Description**
+
+```
+Memory Bridge transpose vos conversations ChatGPT, Gemini et Claude dans votre compte Mem0, afin que vos préférences, vos décisions et vos informations importantes soient disponibles pour tout assistant connecté à Mem0 (Claude, ChatGPT, vos propres agents, etc.).
+
+COMMENT ÇA MARCHE
+- Un bouton « Enregistrer dans Mem0 » apparaît sur chatgpt.com, gemini.google.com et claude.ai.
+- Mode automatique : chaque réponse terminée est envoyée à Mem0, qui ne conserve que les faits pertinents à votre sujet. Quand il n’y a rien à retenir, le bouton se contente de clignoter en gris.
+- Mode manuel : l’enregistrement a lieu uniquement lorsque vous cliquez.
+- Filtre de mémoires éditable : indiquez à Mem0 ce qu’il faut retenir et ce qu’il faut ignorer (par défaut, les calculs, les salutations et les questions ponctuelles sont écartés).
+- Si la connexion Mem0 est perdue, le bouton « Reconnecter » relance l’autorisation en un clic.
+- Interface en français, anglais (États-Unis), portugais (Brésil) et chinois simplifié.
+
+VOTRE COMPTE, VOS DONNÉES
+- L’écran de Paramètres s’ouvre avec une politique de données en langage simple. Rien ne quitte votre navigateur tant que vous n’avez pas coché la case de consentement et enregistré ; décocher la case puis enregistrer arrête l’envoi.
+- Connectez-vous avec votre compte Mem0 (OAuth officiel de Mem0) ou utilisez une clé d’API - directement vers l’API REST ou vers le serveur MCP de Mem0.
+- Vous choisissez l’User ID sous lequel les mémoires sont enregistrées et l’app_id de chaque site.
+- Les clés d’API, les jetons et les numéros de carte qui apparaissent dans une conversation sont masqués avant l’envoi.
+- Tout va directement de votre navigateur vers Mem0. Aucun serveur intermédiaire, aucun pistage, aucune publicité. Le développeur ne reçoit jamais vos données.
+
+Nécessite un compte Mem0 (https://mem0.ai). Projet indépendant, sans lien officiel avec Mem0, OpenAI, Google ou Anthropic.
+```
+
+### 中文（简体）(zh-CN)
+
+**Summary (≤132 caracteres)**
+
+```
+自动将 ChatGPT、Gemini 和 Claude 对话中的重要内容保存到你自己的 Mem0 账户。
+```
+
+**Description**
+
+```
+Memory Bridge 将你的 ChatGPT、Gemini 和 Claude 对话带入你的 Mem0 账户，让你的偏好、决定和重要信息可供任何连接到 Mem0 的助手使用（Claude、ChatGPT、你自己的智能体等）。
+
+使用方法
+- 在 chatgpt.com、gemini.google.com 和 claude.ai 上会出现“保存到 Mem0”按钮。
+- 自动模式：每一条完成的回答都会发送到 Mem0，Mem0 只保留与你有关的重要事实。如果没有值得保存的内容，按钮只会闪烁灰色。
+- 手动模式：只有在你点击时才会保存。
+- 可编辑的记忆过滤器：告诉 Mem0 该记住什么、该忽略什么（默认会跳过计算、问候和一次性提问）。
+- 如果 Mem0 的登录失效，“重新连接”按钮一键重新完成授权。
+- 界面支持中文（简体）、英文（美国）、葡萄牙语（巴西）和法语。
+
+你的账户，你的数据
+- 设置页面打开时会先用通俗语言说明数据政策。在你勾选同意并保存之前，不会发送任何内容；取消勾选并保存后，扩展会停止发送。
+- 使用你的 Mem0 账户登录（Mem0 官方 OAuth），或使用 API 密钥 - 直接发送到 REST API 或 Mem0 自有的 MCP 服务器。
+- 你可以选择记忆保存所用的 User ID，以及每个站点的 app_id。
+- 对话中出现的 API 密钥、令牌和银行卡号会在发送前被隐藏。
+- 所有内容都从你的浏览器直接发送到 Mem0。没有中间服务器，没有追踪，没有广告。开发者不会收到你的任何数据。
+
+需要 Mem0 账户（https://mem0.ai）。本项目为独立项目，与 Mem0、OpenAI、Google 或 Anthropic 无官方关联。
+```
+
+### Imagens por idioma (Chrome)
+
+O Chrome separa **assets localizados** (por idioma da listagem) de **assets globais**. Para as
+listagens fr e zh-CN, subir os arquivos localizados:
+
+| Idioma da listagem | Captura 1280×800 | Blocos promocionais |
+|---|---|---|
+| en-US (padrão) | `store/screenshot-1-options-en.png`, `store/screenshot-2-popup-en.png` | globais (tiles em inglês) |
+| fr | `store/screenshot-1-options-fr.png`, `store/screenshot-2-popup-fr.png` | `store/promo-440x280-fr.png`, `store/promo-1400x560-fr.png` |
+| zh-CN | `store/screenshot-1-options-zh.png`, `store/screenshot-2-popup-zh.png` | `store/promo-440x280-zh.png`, `store/promo-1400x560-zh.png` |
+
+Os blocos promocionais (440×280 e 1400×560) são **globais** no Chrome: só há um par, e o
+texto sai em inglês. Os blocos em fr/zh acima servem para o Edge (que aceita imagens por
+idioma de listagem) e para uso próprio.
+
+Regenerar: `node tools/store-assets.mjs fr` e `node tools/store-assets.mjs zh-CN`
+(idem `en-US` e `pt-BR`).
+
+### Como adicionar uma listagem em outro idioma (Chrome)
+
+O painel do Chrome Web Store tem, no topo da aba **Store listing**, um seletor
+**"Current editing language"** (hoje: *English – en (default)*). É por ele que se cria uma
+listagem em outro idioma — **não** é preciso criar outro item.
+
+1. **Store listing** → seletor **Current editing language** → *Add language* → escolher
+   *Français (fr)* e *中文（简体）(zh-CN)*.
+2. Em cada idioma novo: colar a **Descrição** do bloco correspondente em "Listagem"
+   (o **título** e o **summary** vêm do pacote, já traduzidos em `_locales/<idioma>`).
+3. Subir as **capturas localizadas** (é obrigatório pelo menos uma por listagem —
+   "Localized screenshots: At least one is required").
+4. **Save draft**.
+5. **Package** → *Upload new package* → `dist/memory-bridge-1.1.2-chrome.zip` → *Submit for
+   review*.
+
+O texto completo de cada idioma está nas seções "Listagem" acima.
 
 ## Single purpose (campo obrigatório, ≤1000 caracteres)
 
@@ -248,6 +351,7 @@ Permissions:
 - Host permissions https://mcp.mem0.ai/* and https://api.mem0.ai/*: the only servers the extension talks to.
 - Content scripts on chatgpt.com, chat.openai.com, gemini.google.com and claude.ai: read the last question/answer of the open conversation and show the save button. No data is sent anywhere except to the Mem0 account chosen by the user, and only after the user consents in the extension's own UI.
 
+The interface is available in English (US), Portuguese (Brazil), French and Simplified Chinese; the language can be changed at the top of the settings page (it also follows the browser language by default).
 No remote code is loaded; all code is in the package.
 ```
 

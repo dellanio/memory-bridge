@@ -42,14 +42,14 @@ Como funciona
 • Modo manual: só salva quando você clica.
 • Filtro de memórias editável: diga ao Mem0 o que vale lembrar e o que ignorar (por padrão, ignora cálculos, saudações e perguntas pontuais).
 • Se o login do Mem0 cair, o botão "Reconectar" refaz a autorização em um clique.
-• Interface em português (Brasil) e inglês (EUA).
+• Interface em português (Brasil), inglês (EUA), francês e chinês simplificado.
 
 Sua conta, seus dados
 • A tela de Configurações abre com a política de dados em linguagem simples: nada sai do seu navegador até você marcar a caixa de aceite e salvar, e desmarcar faz a extensão parar de enviar.
 • Entre com a sua conta Mem0 (OAuth oficial do Mem0) ou use uma chave de API — direto na API REST ou no próprio servidor MCP do Mem0.
 • Você escolhe o User ID com que as memórias são gravadas e o app_id de cada site.
 • Chaves de API, tokens e números de cartão que aparecerem na conversa são ocultados antes do envio.
-• Tudo vai direto do seu navegador para o Mem0. Não há servidor intermediário, rastreamento nem anúncios.
+• Tudo vai direto do seu navegador para o Mem0. Não há servidor intermediário, rastreamento nem anúncios. O desenvolvedor nunca recebe os seus dados.
 
 Requer uma conta Mem0 (https://mem0.ai). Projeto independente, sem vínculo oficial com a Mem0, a OpenAI, o Google ou a Anthropic.
 
@@ -75,7 +75,7 @@ How it works
 • Manual mode: saves only when you click.
 • Editable memory filter: tell Mem0 what to remember and what to ignore (by default it skips calculations, greetings and one-off questions).
 • If the Mem0 sign-in drops, the "Reconnect" button redoes the authorization in one click.
-• Interface in English (US) and Portuguese (Brazil).
+• Interface in English (US), Portuguese (Brazil), French and Simplified Chinese.
 
 Your account, your data
 • The Settings screen opens with a plain-language data policy: nothing leaves your browser until you tick the consent box and save, and unticking it stops the extension from sending anything.
@@ -89,6 +89,72 @@ Requires a Mem0 account (https://mem0.ai). Independent project, not officially a
 **Search terms**
 
 mem0, memory, chatgpt, gemini, claude, ai, context
+
+---
+
+## Français
+
+**Description courte**
+
+Enregistrez automatiquement l’essentiel de vos conversations ChatGPT, Gemini et Claude dans votre propre compte Mem0.
+
+**Description**
+
+Memory Bridge transpose vos conversations ChatGPT, Gemini et Claude dans votre compte Mem0, afin que vos préférences, vos décisions et vos informations importantes soient disponibles pour tout assistant connecté à Mem0 (Claude, ChatGPT, vos propres agents, etc.).
+
+Comment ça marche
+• Un bouton « Enregistrer dans Mem0 » apparaît sur chatgpt.com, gemini.google.com et claude.ai.
+• Mode automatique : chaque réponse terminée est envoyée à Mem0, qui ne conserve que les faits pertinents à votre sujet. Quand il n’y a rien à retenir, le bouton se contente de clignoter en gris.
+• Mode manuel : l’enregistrement a lieu uniquement lorsque vous cliquez.
+• Filtre de mémoires éditable : indiquez à Mem0 ce qu’il faut retenir et ce qu’il faut ignorer (par défaut, les calculs, les salutations et les questions ponctuelles sont écartés).
+• Si la connexion Mem0 est perdue, le bouton « Reconnecter » relance l’autorisation en un clic.
+• Interface en français, anglais (États-Unis), portugais (Brésil) et chinois simplifié.
+
+Votre compte, vos données
+• L’écran de Paramètres s’ouvre avec une politique de données en langage simple. Rien ne quitte votre navigateur tant que vous n’avez pas coché la case de consentement et enregistré ; décocher la case puis enregistrer arrête l’envoi.
+• Connectez-vous avec votre compte Mem0 (OAuth officiel de Mem0) ou utilisez une clé d’API — directement vers l’API REST ou vers le serveur MCP de Mem0.
+• Vous choisissez l’User ID sous lequel les mémoires sont enregistrées et l’app_id de chaque site.
+• Les clés d’API, les jetons et les numéros de carte qui apparaissent dans une conversation sont masqués avant l’envoi.
+• Tout va directement de votre navigateur vers Mem0. Aucun serveur intermédiaire, aucun pistage, aucune publicité. Le développeur ne reçoit jamais vos données.
+
+Nécessite un compte Mem0 (https://mem0.ai). Projet indépendant, sans lien officiel avec Mem0, OpenAI, Google ou Anthropic.
+
+**Termes de recherche** (jusqu’à 7)
+
+mem0, mémoire, chatgpt, gemini, claude, ia, contexte
+
+---
+
+## 中文（简体）
+
+**描述简短**
+
+自动将 ChatGPT、Gemini 和 Claude 对话中的重要内容保存到你自己的 Mem0 账户。
+
+**描述**
+
+Memory Bridge 将你的 ChatGPT、Gemini 和 Claude 对话带入你的 Mem0 账户，让你的偏好、决定和重要信息可供任何连接到 Mem0 的助手使用（Claude、ChatGPT、你自己的智能体等）。
+
+使用方法
+• 在 chatgpt.com、gemini.google.com 和 claude.ai 上会出现“保存到 Mem0”按钮。
+• 自动模式：每一条完成的回答都会发送到 Mem0，Mem0 只保留与你有关的重要事实。如果没有值得保存的内容，按钮只会闪烁灰色。
+• 手动模式：只有在你点击时才会保存。
+• 可编辑的记忆过滤器：告诉 Mem0 该记住什么、该忽略什么（默认会跳过计算、问候和一次性提问）。
+• 如果 Mem0 的登录失效，“重新连接”按钮一键重新完成授权。
+• 界面支持中文（简体）、英文（美国）、葡萄牙语（巴西）和法语。
+
+你的账户，你的数据
+• 设置页面打开时会先用通俗语言说明数据政策。在你勾选同意并保存之前，不会发送任何内容；取消勾选并保存后，扩展会停止发送。
+• 使用你的 Mem0 账户登录（Mem0 官方 OAuth），或使用 API 密钥 — 直接发送到 REST API 或 Mem0 自有的 MCP 服务器。
+• 你可以选择记忆保存所用的 User ID，以及每个站点的 app_id。
+• 对话中出现的 API 密钥、令牌和银行卡号会在发送前被隐藏。
+• 所有内容都从你的浏览器直接发送到 Mem0。没有中间服务器，没有追踪，没有广告。开发者不会收到你的任何数据。
+
+需要 Mem0 账户（https://mem0.ai）。本项目为独立项目，与 Mem0、OpenAI、Google 或 Anthropic 无官方关联。
+
+**搜索词**（最多 7 个）
+
+mem0, 记忆, chatgpt, gemini, claude, ai, 上下文
 
 ---
 
@@ -109,4 +175,5 @@ Permissions:
 - Host permissions https://mcp.mem0.ai/* and https://api.mem0.ai/*: the only servers the extension talks to.
 - Content scripts on chatgpt.com, chat.openai.com, gemini.google.com and claude.ai: read the last question/answer of the open conversation and show the save button. No data is sent anywhere except to the Mem0 account chosen by the user, and only after the user consents in the extension's own settings.
 
+The interface is available in English (US), Portuguese (Brazil), French and Simplified Chinese; the language can be changed at the top of the settings page (it also follows the browser language by default).
 No remote code is loaded; all code is in the package.

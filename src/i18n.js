@@ -1,11 +1,12 @@
 // Traduz a página com o idioma escolhido nas configurações (ou o do navegador).
 // Expõe window.tr(chave) e window.i18nReady para os scripts da página.
+const HTML_LANG = { pt_BR: "pt-BR", en: "en-US", fr: "fr", zh_CN: "zh-CN" };
 window.tr = (k) => chrome.i18n.getMessage(k) || k;
 window.i18nReady = (async () => {
   try {
     const { lang, messages } = await chrome.runtime.sendMessage({ type: "i18n" });
     window.tr = (k) => messages[k] || chrome.i18n.getMessage(k) || k;
-    document.documentElement.lang = lang === "pt_BR" ? "pt-BR" : "en-US";
+    document.documentElement.lang = HTML_LANG[lang] || "en-US";
   } catch { /* fica com chrome.i18n */ }
   for (const el of document.querySelectorAll("[data-i18n]")) {
     const m = window.tr(el.dataset.i18n);

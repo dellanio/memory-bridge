@@ -1,0 +1,236 @@
+{
+  "extName": {
+    "message": "Memory Bridge for Mem0"
+  },
+  "extDesc": {
+    "message": "自动将 ChatGPT、Gemini 和 Claude 对话中的重要内容保存到你自己的 Mem0 账户。"
+  },
+  "btnSave": {
+    "message": "保存到 Mem0"
+  },
+  "btnSaving": {
+    "message": "保存中…"
+  },
+  "btnSaved": {
+    "message": "已保存 ✓"
+  },
+  "btnAlready": {
+    "message": "已保存过 ✓"
+  },
+  "btnError": {
+    "message": "出错 — 请查看工具栏图标"
+  },
+  "btnNothing": {
+    "message": "没有可保存的内容 — 请使用诊断"
+  },
+  "tipAuto": {
+    "message": "已开启自动模式"
+  },
+  "tipManual": {
+    "message": "点击保存最近一轮对话"
+  },
+  "optTitle": {
+    "message": "设置"
+  },
+  "secAccount": {
+    "message": "Mem0 账户"
+  },
+  "authOauth": {
+    "message": "使用 Mem0 登录（OAuth，推荐）"
+  },
+  "authApikey": {
+    "message": "API 密钥（高级）"
+  },
+  "authApikeyMcp": {
+    "message": "MCP 服务器上的 API 密钥（无需 OAuth — 即使 Mem0 的客户端注册不可用也能用）"
+  },
+  "connect": {
+    "message": "连接"
+  },
+  "disconnect": {
+    "message": "断开连接"
+  },
+  "test": {
+    "message": "测试连接"
+  },
+  "connected": {
+    "message": "已连接"
+  },
+  "notConnected": {
+    "message": "未连接"
+  },
+  "apiKeyLabel": {
+    "message": "Mem0 API 密钥（仅保存在此浏览器中）"
+  },
+  "secUser": {
+    "message": "你在 Mem0 中的身份"
+  },
+  "userIdLabel": {
+    "message": "User ID（必填）— 记忆保存在此 user_id 下"
+  },
+  "secCapture": {
+    "message": "采集"
+  },
+  "modeManual": {
+    "message": "手动 — 仅在我点击“保存到 Mem0”时"
+  },
+  "modeAuto": {
+    "message": "自动 — 保存每一条完成的回答"
+  },
+  "sitesLabel": {
+    "message": "站点与 app_id"
+  },
+  "redactLabel": {
+    "message": "发送前隐藏明显的机密信息（API 密钥、令牌、银行卡号）"
+  },
+  "save": {
+    "message": "保存"
+  },
+  "saved": {
+    "message": "已保存。"
+  },
+  "privacy": {
+    "message": "发送的内容：仅包括你选择保存的问题和回答，以及站点、会话 ID 和 URL，直接发送到 Mem0。不会发送到其他任何地方。"
+  },
+  "popEnabled": {
+    "message": "已启用"
+  },
+  "popRecent": {
+    "message": "最近活动"
+  },
+  "popEmpty": {
+    "message": "尚未发送任何内容。"
+  },
+  "popOptions": {
+    "message": "设置"
+  },
+  "popReconnect": {
+    "message": "重新连接"
+  },
+  "popClear": {
+    "message": "清除"
+  },
+  "needUser": {
+    "message": "请在设置中填写你的 User ID。"
+  },
+  "optHeading": {
+    "message": "Mem0 集成"
+  },
+  "optWaiting": {
+    "message": "请稍候… 正在打开 Mem0"
+  },
+  "secAccountDesc": {
+    "message": "扩展如何与你的 Mem0 账户通信。"
+  },
+  "secUserDesc": {
+    "message": "每条记忆都保存在此用户下。使用你在其他 Mem0 集成中使用的相同标识符，即可把内容归到一起。"
+  },
+  "secCaptureDesc": {
+    "message": "选择何时保存对话以及在哪些站点保存。app_id 用于在 Mem0 中标识来源。"
+  },
+  "popDiag": {
+    "message": "诊断此标签页"
+  },
+  "diagNoTab": {
+    "message": "此标签页中扩展未激活。请在 Edge 中打开 chatgpt.com、gemini.google.com 或 claude.ai 并刷新页面。"
+  },
+  "secFilter": {
+    "message": "记忆过滤器"
+  },
+  "secFilterDesc": {
+    "message": "随每次对话一起发送的指令，告诉 Mem0 哪些内容值得记住。留空则由 Mem0 自行判断。"
+  },
+  "restoreDefault": {
+    "message": "恢复默认"
+  },
+  "defaultInstructions": {
+    "message": "仅提取关于用户的持久性事实：偏好、观点、个人与工作细节、项目、决定、目标和生活背景。忽略计算、问候、一次性提问、常识性内容、回答中的泛泛信息，以及任何与用户无关的事实。当用户更改某项偏好或决定时，记录新的内容并说明它取代了之前的记录。"
+  },
+  "tipNothing": {
+    "message": "Mem0 在这段对话中没有找到值得记住的内容"
+  },
+  "btnPending": {
+    "message": "已发送 — Mem0 仍在处理"
+  },
+  "logNothing": {
+    "message": "没有可保留的内容"
+  },
+  "langAuto": {
+    "message": "自动（浏览器语言）"
+  },
+  "logConnected": {
+    "message": "已连接到 Mem0（OAuth）"
+  },
+  "errLoginRefused": {
+    "message": "登录被拒绝：$1"
+  },
+  "errLoginInvalid": {
+    "message": "登录无效（状态不匹配）。请重试。"
+  },
+  "errNotConnected": {
+    "message": "尚未连接到 Mem0：请打开设置并点击“连接”"
+  },
+  "errSessionExpired": {
+    "message": "Mem0 会话已过期：请重新连接"
+  },
+  "errUnauthorized": {
+    "message": "Mem0 拒绝了本次登录：请重新连接"
+  },
+  "errClientInvalid": {
+    "message": "Mem0 不再识别此扩展的登录（服务器端已删除该客户端注册）。请打开设置并点击“连接”以注册新的客户端。"
+  },
+  "errDcrUnavailable": {
+    "message": "Mem0 服务器拒绝新的客户端注册（HTTP $1）。在此期间请在设置中使用 API 密钥（MCP 或 REST）。"
+  },
+  "errNoApiKey": {
+    "message": "未设置 API 密钥"
+  },
+  "errNeedUserLog": {
+    "message": "请在设置中填写你的 User ID"
+  },
+  "errKeyRefused": {
+    "message": "API 密钥被拒绝"
+  },
+  "testKeyOk": {
+    "message": "API 密钥有效。"
+  },
+  "testMcpOk": {
+    "message": "已连接：可用 $1 个 Mem0 工具。"
+  },
+  "errGeneric": {
+    "message": "错误"
+  },
+  "userIdPlaceholder": {
+    "message": "例如 maria"
+  },
+  "consentHeading": {
+    "message": "开始之前：本扩展会如何处理你的数据"
+  },
+  "consentDesc": {
+    "message": "本扩展会读取 chatgpt.com、gemini.google.com 和 claude.ai 上当前对话的最后一个问题和最后一条回答，并将你选择的内容发送到你自己的 Mem0 账户。"
+  },
+  "consentItem1": {
+    "message": "开发者不会收到你的任何数据：所有内容都从你的浏览器直接发送到你自己的 Mem0 账户。"
+  },
+  "consentItem2": {
+    "message": "你授权的 API 密钥或访问令牌仅保存在你的浏览器中（chrome.storage.local）。"
+  },
+  "consentItem3": {
+    "message": "除你选择的 Mem0 服务外，不会将数据用于广告、分析或与第三方共享。"
+  },
+  "consentAccept": {
+    "message": "我已阅读并同意：最后一个问题和最后一条回答可能会被发送到我自己的 Mem0 账户，且不会向开发者发送任何内容。"
+  },
+  "consentRequired": {
+    "message": "在连接和保存对话之前，你需要先接受上述条款。"
+  },
+  "consentNeed": {
+    "message": "请在设置中接受数据政策后才能发送到 Mem0。"
+  },
+  "consentOff": {
+    "message": "未获得同意时，不会向 Mem0 发送任何内容。"
+  },
+  "consentPolicy": {
+    "message": "完整的隐私政策"
+  }
+}

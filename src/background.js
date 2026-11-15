@@ -37,11 +37,15 @@ const DEFAULTS = {
 // ---------- idioma ----------
 // chrome.i18n segue só o idioma do navegador; para o usuário poder escolher, as
 // mensagens de _locales são carregadas aqui e servidas às páginas e ao content script.
-const LANGS = ["pt_BR", "en"];
+const LANGS = ["pt_BR", "en", "fr", "zh_CN"];
 const dictCache = {};
 function resolveLang(pref) {
   if (LANGS.includes(pref)) return pref;
-  return (chrome.i18n.getUILanguage() || "").toLowerCase().startsWith("pt") ? "pt_BR" : "en";
+  const ui = (chrome.i18n.getUILanguage() || "").toLowerCase();
+  if (ui.startsWith("pt")) return "pt_BR";
+  if (ui.startsWith("fr")) return "fr";
+  if (ui.startsWith("zh")) return "zh_CN";
+  return "en";
 }
 async function dict(lang) {
   if (!dictCache[lang]) {
